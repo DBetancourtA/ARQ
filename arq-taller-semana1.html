@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller Semana 1 — Arquitectura de Computadoras · ITB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  CONFIGURACIÓN DEL DOCENTE — edita solo esta sección        ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+const ACCESS_PASSWORDS = {
+  1: "vonneumann1",   // Grupo 1 — Máquina Von Neumann
+  2: "harvard2",      // Grupo 2 — Máquina Harvard
+  3: "microctrl3",    // Grupo 3 — Microcontrolador
+  4: "cpuhumana4",    // Grupo 4 — CPU Humana
+  5: "riskvcisc5"     // Grupo 5 — RISC vs CISC
+};
+
+const SOLUTION_PASSWORD = "arqitb2025"; // ← clave maestra para ver guías completas
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1117;--surface:#161B22;--surface2:#1C2129;--border:#21262D;
+  --cyan:#06B6D4;--cyan-dim:#062830;
+  --indigo:#818CF8;--indigo-dim:#1e1b4b;
+  --green:#4ADE80;--green-dim:#1a4731;
+  --amber:#F59E0B;--amber-dim:#2d2208;
+  --red:#FF7B72;--muted:#8B949E;--text:#E6EDF3;--radius:10px;
+
+  /* Group accent colors */
+  --g1:#3B82F6;--g1-dim:rgba(59,130,246,.1);
+  --g2:#EAB308;--g2-dim:rgba(234,179,8,.1);
+  --g3:#EF4444;--g3-dim:rgba(239,68,68,.1);
+  --g4:#22C55E;--g4-dim:rgba(34,197,94,.1);
+  --g5:#A855F7;--g5-dim:rgba(168,85,247,.1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+  font-size:15px;line-height:1.65}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(6,182,212,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(6,182,212,.025) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.92);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:54px;gap:12px}
+.nav-brand{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+  color:var(--cyan);display:flex;align-items:center;gap:7px;white-space:nowrap}
+.nav-brand .sep{color:var(--border)}
+.nav-brand .dim{color:var(--muted);font-weight:400}
+.nav-timer{font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--amber);display:flex;align-items:center;gap:6px}
+#td{font-size:16px;font-weight:700;min-width:58px}
+.tbtn{background:var(--surface2);border:1px solid var(--border);
+  color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:3px 8px;border-radius:5px;cursor:pointer;transition:all .2s}
+.tbtn:hover{color:var(--text);border-color:var(--muted)}
+.tbtn.on{background:var(--cyan-dim);color:var(--cyan);border-color:var(--cyan)}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;max-width:860px;margin:0 auto;
+  padding:56px 1.5rem 40px;text-align:center}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:var(--muted);letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:10px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';flex:1;max-width:60px;height:1px;background:var(--border)}
+.hero h1{font-family:'JetBrains Mono',monospace;
+  font-size:clamp(1.8rem,4.5vw,2.8rem);font-weight:700;line-height:1.1;margin-bottom:10px}
+.hero h1 .ac{color:var(--cyan)}
+.hero h1 .dm{color:var(--muted)}
+.hero p{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto 28px}
+.hero-meta{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+  color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace}
+.hero-meta span{display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);display:inline-block}
+
+/* ── WRAP ── */
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 1.5rem}
+
+/* ── INSTR BOX ── */
+.instr-box{background:var(--cyan-dim);border:1px solid rgba(6,182,212,.25);
+  border-radius:var(--radius);padding:20px 24px;margin-bottom:36px}
+.instr-box h3{font-family:'JetBrains Mono',monospace;font-size:12px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:10px}
+.instr-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.instr-list li{font-size:14px;color:var(--muted);display:flex;gap:8px}
+.instr-list li::before{content:'→';color:var(--cyan);flex-shrink:0}
+.instr-list li strong{color:var(--text)}
+
+/* ── PREGUNTAS BOX ── */
+.questions-box{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px 24px;margin-bottom:36px}
+.questions-box h3{font-family:'JetBrains Mono',monospace;font-size:12px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:14px}
+.q-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.q-grid{grid-template-columns:1fr}}
+.q-item{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;
+  font-size:13px;color:var(--muted);display:flex;gap:8px}
+.q-item::before{content:'❓';flex-shrink:0}
+.q-item strong{color:var(--text)}
+
+/* ── GROUP CARDS ── */
+.groups{display:flex;flex-direction:column;gap:28px;padding-bottom:72px}
+
+.card{border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden;transition:border-color .3s}
+
+/* unlocked states per group */
+.card.unlocked.g1{border-color:var(--g1)}
+.card.unlocked.g2{border-color:var(--g2)}
+.card.unlocked.g3{border-color:var(--g3)}
+.card.unlocked.g4{border-color:var(--g4)}
+.card.unlocked.g5{border-color:var(--g5)}
+
+/* ── LOCK ── */
+.lock-overlay{padding:28px 32px;display:flex;flex-direction:column;
+  align-items:center;gap:14px;text-align:center;min-height:120px}
+.lock-icon{width:44px;height:44px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:20px}
+.lock-title{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--muted)}
+.lock-sub{font-size:13px;color:var(--muted);opacity:.7}
+.lock-form{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.lock-input{background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;
+  padding:8px 14px;border-radius:7px;outline:none;transition:border-color .2s;width:180px}
+.lock-input:focus{border-color:var(--cyan)}
+.lock-input.err{border-color:var(--red);animation:shake .3s}
+.lock-input::placeholder{color:var(--muted);opacity:.5}
+.btn-unlock{background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;
+  padding:8px 16px;border-radius:7px;cursor:pointer;transition:all .2s}
+.btn-unlock:hover{border-color:var(--cyan);color:var(--cyan)}
+.lock-err{font-size:12px;color:var(--red);font-family:'JetBrains Mono',monospace}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── CARD CONTENT ── */
+.card-content{display:none}
+.card.unlocked .card-content{display:block}
+.card.unlocked .lock-overlay{display:none}
+
+/* Card header */
+.card-header{display:flex;align-items:flex-start;gap:14px;
+  padding:22px 26px 18px;border-bottom:1px solid var(--border)}
+.group-badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.08em;padding:4px 12px;border-radius:4px;white-space:nowrap;
+  margin-top:3px;flex-shrink:0}
+.gb1{background:var(--g1-dim);color:var(--g1);border:1px solid rgba(59,130,246,.3)}
+.gb2{background:var(--g2-dim);color:var(--g2);border:1px solid rgba(234,179,8,.3)}
+.gb3{background:var(--g3-dim);color:var(--g3);border:1px solid rgba(239,68,68,.3)}
+.gb4{background:var(--g4-dim);color:var(--g4);border:1px solid rgba(34,197,94,.3)}
+.gb5{background:var(--g5-dim);color:var(--g5);border:1px solid rgba(168,85,247,.3)}
+.card-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.card-desc{color:var(--muted);font-size:13px}
+.mission-badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:20px}
+
+/* Card body */
+.card-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:620px){.card-body{grid-template-columns:1fr}}
+.card-left{padding:22px 26px;border-right:1px solid var(--border)}
+.card-right{padding:22px 26px}
+@media(max-width:620px){.card-left{border-right:none;border-bottom:1px solid var(--border)}}
+
+.slabel{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+
+/* Mission tasks */
+.mission-tasks{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.task{display:flex;gap:10px;align-items:flex-start}
+.task-n{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  min-width:22px;height:22px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0}
+.tn1{color:var(--g1);background:var(--g1-dim);border:1px solid rgba(59,130,246,.25)}
+.tn2{color:var(--g2);background:var(--g2-dim);border:1px solid rgba(234,179,8,.25)}
+.tn3{color:var(--g3);background:var(--g3-dim);border:1px solid rgba(239,68,68,.25)}
+.tn4{color:var(--g4);background:var(--g4-dim);border:1px solid rgba(34,197,94,.25)}
+.tn5{color:var(--g5);background:var(--g5-dim);border:1px solid rgba(168,85,247,.25)}
+.task-text{font-size:13.5px;color:var(--text);line-height:1.55}
+.ic{font-family:'JetBrains Mono',monospace;font-size:12px;
+  background:var(--surface2);border:1px solid var(--border);
+  color:#79C0FF;padding:1px 6px;border-radius:4px}
+
+/* Concept pills */
+.concept-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cp{font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:3px 9px;border-radius:4px;background:var(--surface2);
+  border:1px solid var(--border);color:var(--muted)}
+
+/* Diagram area */
+.diagram-area{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:16px;margin-bottom:14px;overflow-x:auto}
+.diagram-area svg{max-width:100%;height:auto}
+
+/* Tip box */
+.tip-box{background:var(--cyan-dim);border:1px solid rgba(6,182,212,.25);
+  border-radius:8px;padding:12px 15px;font-size:13px;color:var(--muted);
+  line-height:1.6;margin-top:14px}
+.tip-box strong{color:var(--cyan)}
+
+/* Guia key points */
+.guide-points{display:flex;flex-direction:column;gap:8px}
+.gp{display:flex;gap:9px;align-items:flex-start;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;padding:10px 12px}
+.gp-icon{font-size:16px;flex-shrink:0}
+.gp-text{font-size:13px;color:var(--muted);line-height:1.5}
+.gp-text strong{color:var(--text)}
+
+/* ── FOOTER CARD ── */
+.card-footer{padding:14px 26px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sol-note{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);flex:1;min-width:140px}
+.sol-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sol-input{background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;
+  padding:7px 12px;border-radius:7px;outline:none;transition:border-color .2s;width:160px}
+.sol-input:focus{border-color:var(--amber)}
+.sol-input.err{border-color:var(--red);animation:shake .3s}
+.sol-input::placeholder{color:var(--muted);opacity:.5}
+.btn-sol{display:inline-flex;align-items:center;gap:6px;
+  background:var(--amber);color:#0D1117;
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:12px;padding:7px 14px;border-radius:7px;
+  border:none;cursor:pointer;transition:opacity .2s,transform .15s;white-space:nowrap}
+.btn-sol:hover{opacity:.85;transform:translateY(-1px)}
+.sol-err{font-size:12px;color:var(--red);font-family:'JetBrains Mono',monospace;width:100%}
+.sol-ok{font-size:12px;color:var(--green);font-family:'JetBrains Mono',monospace;width:100%}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;right:22px;z-index:999;
+  background:var(--cyan-dim);border:1px solid var(--cyan);
+  color:var(--cyan);font-family:'JetBrains Mono',monospace;
+  font-size:13px;padding:10px 18px;border-radius:8px;
+  opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+footer{border-top:1px solid var(--border);padding:26px 2rem;
+  text-align:center;color:var(--muted);
+  font-size:13px;font-family:'JetBrains Mono',monospace}
+footer span{color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M9 2v2M15 20v2M9 20v2M2 15h2M2 9h2M20 15h2M20 9h2"/></svg>
+    ARQ <span class="sep">/</span> <span class="dim">semana-1</span> <span class="sep">/</span> taller-grupos
+  </div>
+  <div class="nav-timer">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span id="td">00:00</span>
+    <div style="display:flex;gap:4px">
+      <button class="tbtn" id="tbs" onclick="tStart()">▶</button>
+      <button class="tbtn" onclick="tPause()">⏸</button>
+      <button class="tbtn" onclick="tReset()">↺</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Taller en grupos · Semana 1 · Arquitectura</div>
+  <h1><span class="dm">Misiones de</span><br><span class="ac">Arquitectura</span></h1>
+  <p>Cada grupo recibe una misión distinta y una clave de acceso. Al finalizar, presentan sus resultados al resto de la clase.</p>
+  <div class="hero-meta">
+    <span><span class="dot"></span> 5 grupos</span>
+    <span><span class="dot"></span> 5 misiones</span>
+    <span><span class="dot"></span> Presentación oral</span>
+    <span><span class="dot"></span> Guía descargable</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- INSTRUCCIONES -->
+  <div class="instr-box">
+    <h3>// Instrucciones del taller</h3>
+    <ul class="instr-list">
+      <li><strong>Paso 1:</strong> El docente asigna tu número de grupo y te da la clave de acceso.</li>
+      <li><strong>Paso 2:</strong> Ingresa la clave en tu misión para desbloquearla y lee el objetivo.</li>
+      <li><strong>Paso 3:</strong> Trabaja en equipo siguiendo los pasos de tu misión. Usa el cronómetro del nav.</li>
+      <li><strong>Paso 4:</strong> Prepara una presentación de <strong>5 minutos</strong> para exponer al resto de la clase.</li>
+      <li><strong>Paso 5:</strong> Cuando el docente lo indique, ingresa la <strong>clave de solución</strong> para descargar la guía completa.</li>
+    </ul>
+  </div>
+
+  <!-- PREGUNTAS QUE TODOS DEBEN RESPONDER -->
+  <div class="questions-box">
+    <h3>// Preguntas que todo grupo debe responder en su presentación</h3>
+    <div class="q-grid">
+      <div class="q-item"><strong>¿Qué construyeron o simularon?</strong></div>
+      <div class="q-item"><strong>¿Cómo fluye la información en su arquitectura?</strong></div>
+      <div class="q-item"><strong>¿Qué arquitectura representa su misión?</strong></div>
+      <div class="q-item"><strong>¿Dónde se usa esta arquitectura en la vida real?</strong></div>
+    </div>
+  </div>
+
+  <div class="groups">
+
+    <!-- ═══════════════ GRUPO 1 — VON NEUMANN ═══════════════ -->
+    <div class="card g1" id="card-1">
+      <div class="lock-overlay">
+        <div class="lock-icon">🔵</div>
+        <div class="lock-title">Misión 1 — Máquina Von Neumann</div>
+        <div class="lock-sub">Solo el Grupo 1 puede acceder</div>
+        <div class="lock-form">
+          <input class="lock-input" id="ai-1" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')unlock(1)">
+          <button class="btn-unlock" onclick="unlock(1)">Desbloquear →</button>
+        </div>
+        <div class="lock-err" id="ae-1" style="display:none">Clave incorrecta.</div>
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="group-badge gb1">🟦 GRUPO 1</div>
+          <div>
+            <div class="card-title">Misión: Máquina Von Neumann</div>
+            <div class="card-desc">Construir y explicar la arquitectura de memoria única — con su famoso cuello de botella</div>
+          </div>
+          <div class="mission-badge">🏛️</div>
+        </div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="slabel">// Tu misión paso a paso</div>
+            <div class="mission-tasks">
+              <div class="task"><div class="task-n tn1">1</div><div class="task-text">Dibuja en un papel o en la pizarra el diagrama de Von Neumann: <span class="ic">CPU ↔ Bus único ↔ Memoria (datos+instrucciones)</span></div></div>
+              <div class="task"><div class="task-n tn1">2</div><div class="task-text">Etiqueta claramente la <strong>memoria única</strong> que guarda tanto datos como instrucciones, y el <strong>bus compartido</strong> que conecta todo</div></div>
+              <div class="task"><div class="task-n tn1">3</div><div class="task-text">Explica el <strong>"cuello de botella"</strong> con este ejemplo: la CPU quiere leer una instrucción Y datos al mismo tiempo, pero solo hay un bus — ¿qué pasa?</div></div>
+              <div class="task"><div class="task-n tn1">4</div><div class="task-text">Muestra el <strong>ciclo Fetch → Decode → Execute</strong> pasando por ese bus único</div></div>
+              <div class="task"><div class="task-n tn1">5</div><div class="task-text">Nombra 2 dispositivos del mundo real que usen Von Neumann: <strong>computadoras de escritorio, laptops, servidores</strong></div></div>
+            </div>
+            <div class="slabel">// Conceptos que tu grupo debe dominar</div>
+            <div class="concept-pills">
+              <span class="cp">Memoria única</span>
+              <span class="cp">Bus compartido</span>
+              <span class="cp">Cuello de botella</span>
+              <span class="cp">Fetch-Decode-Execute</span>
+              <span class="cp">John von Neumann 1945</span>
+            </div>
+          </div>
+          <div class="card-right">
+            <div class="slabel">// Diagrama de referencia</div>
+            <div class="diagram-area">
+              <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+                <rect x="10" y="50" width="90" height="60" rx="6" fill="#062830" stroke="#3B82F6" stroke-width="1.5"/>
+                <text x="55" y="77" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#3B82F6">CPU</text>
+                <text x="55" y="93" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">CU + ALU</text>
+                <text x="55" y="106" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Registros</text>
+
+                <!-- Bus único -->
+                <rect x="108" y="75" width="70" height="10" rx="2" fill="#374151"/>
+                <text x="143" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6B7280">BUS ÚNICO</text>
+
+                <!-- Memoria única -->
+                <rect x="186" y="30" width="110" height="100" rx="6" fill="#1C2129" stroke="#F59E0B" stroke-width="1.5"/>
+                <text x="241" y="58" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#F59E0B">MEMORIA</text>
+                <text x="241" y="72" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">única para todo</text>
+                <rect x="200" y="82" width="82" height="18" rx="3" fill="#2d2208" stroke="#F59E0B" stroke-width="1"/>
+                <text x="241" y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#F59E0B">Instrucciones</text>
+                <rect x="200" y="104" width="82" height="18" rx="3" fill="#062830" stroke="#3B82F6" stroke-width="1"/>
+                <text x="241" y="117" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#3B82F6">Datos</text>
+
+                <!-- Cuello de botella label -->
+                <text x="143" y="130" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#EF4444">⚠ cuello de botella</text>
+                <line x1="143" y1="87" x2="143" y2="120" stroke="#EF4444" stroke-width="1" stroke-dasharray="3,2"/>
+              </svg>
+            </div>
+            <div class="slabel">// Guía para tu exposición</div>
+            <div class="guide-points">
+              <div class="gp"><div class="gp-icon">🎯</div><div class="gp-text"><strong>Inicio:</strong> "Nuestra arquitectura tiene UNA sola memoria para datos e instrucciones..."</div></div>
+              <div class="gp"><div class="gp-icon">⚠️</div><div class="gp-text"><strong>Problema:</strong> "El cuello de botella ocurre cuando la CPU quiere instrucciones y datos al mismo tiempo pero el bus es uno solo..."</div></div>
+              <div class="gp"><div class="gp-icon">🌍</div><div class="gp-text"><strong>Vida real:</strong> "Todas las PCs y laptops que usamos hoy se basan en este modelo..."</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="sol-note">🔒 Clave del docente para descargar la guía completa</div>
+          <div class="sol-form">
+            <input class="sol-input" id="si-1" type="password" placeholder="clave solución" onkeydown="if(event.key==='Enter')dlSol(1)">
+            <button class="btn-sol" onclick="dlSol(1)">⬇ Descargar guía</button>
+            <div class="sol-err" id="se-1" style="display:none">Clave incorrecta.</div>
+            <div class="sol-ok"  id="so-1" style="display:none">✓ Descargando guia_vonneumann.txt…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ GRUPO 2 — HARVARD ═══════════════ -->
+    <div class="card g2" id="card-2">
+      <div class="lock-overlay">
+        <div class="lock-icon">🟡</div>
+        <div class="lock-title">Misión 2 — Máquina Harvard</div>
+        <div class="lock-sub">Solo el Grupo 2 puede acceder</div>
+        <div class="lock-form">
+          <input class="lock-input" id="ai-2" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')unlock(2)">
+          <button class="btn-unlock" onclick="unlock(2)">Desbloquear →</button>
+        </div>
+        <div class="lock-err" id="ae-2" style="display:none">Clave incorrecta.</div>
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="group-badge gb2">🟨 GRUPO 2</div>
+          <div>
+            <div class="card-title">Misión: Máquina Harvard</div>
+            <div class="card-desc">Memorias separadas, buses independientes — explicar por qué es más eficiente</div>
+          </div>
+          <div class="mission-badge">🏫</div>
+        </div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="slabel">// Tu misión paso a paso</div>
+            <div class="mission-tasks">
+              <div class="task"><div class="task-n tn2">1</div><div class="task-text">Dibuja el diagrama Harvard: <span class="ic">CPU</span> conectada a <span class="ic">Memoria de Instrucciones</span> Y <span class="ic">Memoria de Datos</span> por buses <strong>separados</strong></div></div>
+              <div class="task"><div class="task-n tn2">2</div><div class="task-text">Resalta que hay <strong>dos buses independientes</strong> — uno para instrucciones y otro para datos — que pueden funcionar al mismo tiempo</div></div>
+              <div class="task"><div class="task-n tn2">3</div><div class="task-text">Explica cómo esto <strong>elimina el cuello de botella</strong> de Von Neumann: la CPU puede leer instrucciones y datos simultáneamente</div></div>
+              <div class="task"><div class="task-n tn2">4</div><div class="task-text">Presenta la <strong>"Harvard Modificada"</strong>: los procesadores modernos (Intel, AMD) usan cachés separadas L1-I y L1-D internamente</div></div>
+              <div class="task"><div class="task-n tn2">5</div><div class="task-text">Nombra 2 ejemplos reales: <strong>microcontroladores PIC, procesadores DSP, Arduino AVR</strong></div></div>
+            </div>
+            <div class="slabel">// Conceptos que tu grupo debe dominar</div>
+            <div class="concept-pills">
+              <span class="cp">Memorias separadas</span>
+              <span class="cp">Buses independientes</span>
+              <span class="cp">Acceso paralelo</span>
+              <span class="cp">Harvard modificada</span>
+              <span class="cp">DSP · PIC · AVR</span>
+            </div>
+          </div>
+          <div class="card-right">
+            <div class="slabel">// Diagrama de referencia</div>
+            <div class="diagram-area">
+              <svg viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+                <!-- CPU center -->
+                <rect x="125" y="65" width="90" height="50" rx="6" fill="#062830" stroke="#EAB308" stroke-width="1.5"/>
+                <text x="170" y="87" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#EAB308">CPU</text>
+                <text x="170" y="103" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">CU + ALU</text>
+
+                <!-- Mem instrucciones (top left) -->
+                <rect x="10" y="10" width="100" height="50" rx="6" fill="#2d2208" stroke="#EAB308" stroke-width="1.5"/>
+                <text x="60" y="32" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#EAB308">Memoria</text>
+                <text x="60" y="46" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#EAB308">Instrucciones</text>
+
+                <!-- Mem datos (bottom left) -->
+                <rect x="10" y="120" width="100" height="50" rx="6" fill="#062830" stroke="#3B82F6" stroke-width="1.5"/>
+                <text x="60" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#3B82F6">Memoria</text>
+                <text x="60" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#3B82F6">Datos</text>
+
+                <!-- Bus instrucciones -->
+                <line x1="112" y1="35" x2="123" y2="80" stroke="#EAB308" stroke-width="2" stroke-dasharray="5,3"/>
+                <text x="55" y="82" font-family="JetBrains Mono" font-size="8" fill="#EAB308">Bus inst.</text>
+
+                <!-- Bus datos -->
+                <line x1="112" y1="145" x2="123" y2="102" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5,3"/>
+                <text x="52" y="120" font-family="JetBrains Mono" font-size="8" fill="#3B82F6">Bus datos</text>
+
+                <!-- Paralelo label -->
+                <text x="230" y="92" font-family="JetBrains Mono" font-size="9" fill="#22C55E">✓ Paralelo</text>
+                <text x="230" y="105" font-family="JetBrains Mono" font-size="9" fill="#22C55E">sin espera</text>
+
+                <!-- E/S -->
+                <rect x="253" y="65" width="75" height="50" rx="5" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+                <text x="290" y="87" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#4ADE80">E/S</text>
+                <text x="290" y="103" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Periféricos</text>
+              </svg>
+            </div>
+            <div class="slabel">// Guía para tu exposición</div>
+            <div class="guide-points">
+              <div class="gp"><div class="gp-icon">🎯</div><div class="gp-text"><strong>Inicio:</strong> "Nuestra arquitectura tiene DOS memorias separadas: una para el programa y otra para los datos..."</div></div>
+              <div class="gp"><div class="gp-icon">⚡</div><div class="gp-text"><strong>Ventaja:</strong> "Al tener buses independientes, la CPU puede buscar instrucciones y datos al mismo tiempo — sin esperar..."</div></div>
+              <div class="gp"><div class="gp-icon">🌍</div><div class="gp-text"><strong>Vida real:</strong> "Los microcontroladores de Arduino y los chips de audio digital (DSP) usan Harvard..."</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="sol-note">🔒 Clave del docente para descargar la guía completa</div>
+          <div class="sol-form">
+            <input class="sol-input" id="si-2" type="password" placeholder="clave solución" onkeydown="if(event.key==='Enter')dlSol(2)">
+            <button class="btn-sol" onclick="dlSol(2)">⬇ Descargar guía</button>
+            <div class="sol-err" id="se-2" style="display:none">Clave incorrecta.</div>
+            <div class="sol-ok"  id="so-2" style="display:none">✓ Descargando guia_harvard.txt…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ GRUPO 3 — MICROCONTROLADOR ═══════════════ -->
+    <div class="card g3" id="card-3">
+      <div class="lock-overlay">
+        <div class="lock-icon">🔴</div>
+        <div class="lock-title">Misión 3 — Microcontrolador</div>
+        <div class="lock-sub">Solo el Grupo 3 puede acceder</div>
+        <div class="lock-form">
+          <input class="lock-input" id="ai-3" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')unlock(3)">
+          <button class="btn-unlock" onclick="unlock(3)">Desbloquear →</button>
+        </div>
+        <div class="lock-err" id="ae-3" style="display:none">Clave incorrecta.</div>
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="group-badge gb3">🟥 GRUPO 3</div>
+          <div>
+            <div class="card-title">Misión: Microcontrolador</div>
+            <div class="card-desc">Diseñar un sistema tipo Arduino o ESP32 — todo integrado en un solo chip</div>
+          </div>
+          <div class="mission-badge">⚙️</div>
+        </div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="slabel">// Tu misión paso a paso</div>
+            <div class="mission-tasks">
+              <div class="task"><div class="task-n tn3">1</div><div class="task-text">Dibuja un chip único que contenga <strong>todos estos componentes adentro</strong>: CPU, Flash (programa), SRAM (datos), GPIO, Timers y UART</div></div>
+              <div class="task"><div class="task-n tn3">2</div><div class="task-text">Elige UN ejemplo real: <strong>Arduino</strong> (semáforo), <strong>ESP32</strong> (sensor de temperatura WiFi) o <strong>PIC</strong> (control de motor)</div></div>
+              <div class="task"><div class="task-n tn3">3</div><div class="task-text">Explica cómo fluye la información: el programa en <strong>Flash</strong> → CPU ejecuta → Lee sensor por <strong>GPIO</strong> → Envía datos por <strong>UART/WiFi</strong></div></div>
+              <div class="task"><div class="task-n tn3">4</div><div class="task-text">Compara con un microprocesador: el MCU tiene todo integrado, el microprocesador necesita chips externos</div></div>
+              <div class="task"><div class="task-n tn3">5</div><div class="task-text">Menciona ventajas: <strong>bajo costo</strong> ($1-$10), <strong>bajo consumo</strong> (milivatios), <strong>tamaño mínimo</strong></div></div>
+            </div>
+            <div class="slabel">// Conceptos que tu grupo debe dominar</div>
+            <div class="concept-pills">
+              <span class="cp">Todo en un chip</span>
+              <span class="cp">Flash · SRAM</span>
+              <span class="cp">GPIO · Timers</span>
+              <span class="cp">Arduino · ESP32 · PIC</span>
+              <span class="cp">vs Microprocesador</span>
+            </div>
+          </div>
+          <div class="card-right">
+            <div class="slabel">// Diagrama de referencia</div>
+            <div class="diagram-area">
+              <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+                <!-- Chip boundary -->
+                <rect x="20" y="10" width="280" height="175" rx="10" fill="#0D1117" stroke="#EF4444" stroke-width="2" stroke-dasharray="6,3"/>
+                <text x="160" y="28" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#EF4444">MCU — todo en un chip</text>
+
+                <!-- CPU -->
+                <rect x="110" y="38" width="100" height="40" rx="5" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+                <text x="160" y="56" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#06B6D4">CPU</text>
+                <text x="160" y="72" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">CU + ALU</text>
+
+                <!-- Flash -->
+                <rect x="30" y="38" width="70" height="40" rx="5" fill="#2d2208" stroke="#F59E0B" stroke-width="1"/>
+                <text x="65" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#F59E0B">Flash</text>
+                <text x="65" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Programa</text>
+                <line x1="102" y1="58" x2="108" y2="58" stroke="#F59E0B" stroke-width="1.5"/>
+
+                <!-- SRAM -->
+                <rect x="220" y="38" width="70" height="40" rx="5" fill="#1e1b4b" stroke="#818CF8" stroke-width="1"/>
+                <text x="255" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#818CF8">SRAM</text>
+                <text x="255" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Datos</text>
+                <line x1="212" y1="58" x2="218" y2="58" stroke="#818CF8" stroke-width="1.5"/>
+
+                <!-- Bus interno -->
+                <rect x="30" y="88" width="260" height="8" rx="2" fill="#21262D"/>
+                <text x="160" y="108" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Bus interno</text>
+
+                <!-- Periféricos -->
+                <rect x="30" y="118" width="58" height="35" rx="4" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+                <text x="59" y="133" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#4ADE80">GPIO</text>
+                <text x="59" y="147" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="#8B949E">Pines</text>
+
+                <rect x="97" y="118" width="58" height="35" rx="4" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+                <text x="126" y="133" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#4ADE80">Timer</text>
+                <text x="126" y="147" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="#8B949E">Reloj</text>
+
+                <rect x="164" y="118" width="58" height="35" rx="4" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+                <text x="193" y="133" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#4ADE80">ADC</text>
+                <text x="193" y="147" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="#8B949E">Analógico</text>
+
+                <rect x="231" y="118" width="59" height="35" rx="4" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+                <text x="260" y="133" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#4ADE80">UART</text>
+                <text x="260" y="147" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="#8B949E">Com.</text>
+
+                <text x="160" y="172" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">Periféricos integrados</text>
+              </svg>
+            </div>
+            <div class="slabel">// Guía para tu exposición</div>
+            <div class="guide-points">
+              <div class="gp"><div class="gp-icon">🎯</div><div class="gp-text"><strong>Inicio:</strong> "Nuestro sistema tiene CPU, memoria, y periféricos en UN SOLO chip del tamaño de una uña..."</div></div>
+              <div class="gp"><div class="gp-icon">💡</div><div class="gp-text"><strong>Ejemplo:</strong> "Un Arduino controla un semáforo: el programa en Flash dice 'espera 30s, cambia a verde', la CPU lo ejecuta y manda señal por GPIO..."</div></div>
+              <div class="gp"><div class="gp-icon">🌍</div><div class="gp-text"><strong>Vida real:</strong> "Microondas, lavadoras, semáforos, termostatos — todos tienen un MCU adentro..."</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="sol-note">🔒 Clave del docente para descargar la guía completa</div>
+          <div class="sol-form">
+            <input class="sol-input" id="si-3" type="password" placeholder="clave solución" onkeydown="if(event.key==='Enter')dlSol(3)">
+            <button class="btn-sol" onclick="dlSol(3)">⬇ Descargar guía</button>
+            <div class="sol-err" id="se-3" style="display:none">Clave incorrecta.</div>
+            <div class="sol-ok"  id="so-3" style="display:none">✓ Descargando guia_microcontrolador.txt…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ GRUPO 4 — CPU HUMANA ═══════════════ -->
+    <div class="card g4" id="card-4">
+      <div class="lock-overlay">
+        <div class="lock-icon">🟢</div>
+        <div class="lock-title">Misión 4 — CPU Humana</div>
+        <div class="lock-sub">Solo el Grupo 4 puede acceder</div>
+        <div class="lock-form">
+          <input class="lock-input" id="ai-4" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')unlock(4)">
+          <button class="btn-unlock" onclick="unlock(4)">Desbloquear →</button>
+        </div>
+        <div class="lock-err" id="ae-4" style="display:none">Clave incorrecta.</div>
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="group-badge gb4">🟩 GRUPO 4</div>
+          <div>
+            <div class="card-title">Misión: CPU Humana</div>
+            <div class="card-desc">Simular el procesador como si fueran personas — dramatizar cómo se ejecuta una instrucción</div>
+          </div>
+          <div class="mission-badge">🧠</div>
+        </div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="slabel">// Tu misión paso a paso</div>
+            <div class="mission-tasks">
+              <div class="task"><div class="task-n tn4">1</div><div class="task-text">Asigna roles a los miembros del grupo: <span class="ic">Unidad de Control</span> (jefe), <span class="ic">ALU</span> (calculadora humana), <span class="ic">Memoria</span> (archivador con papeles), <span class="ic">Registro</span> (pizarrón temporal)</div></div>
+              <div class="task"><div class="task-n tn4">2</div><div class="task-text">Dramatiza la instrucción <strong>"Suma 5 + 3"</strong>: Control pide a Memoria los números → Memoria los entrega → Control le da a ALU → ALU calcula → resultado va al Registro</div></div>
+              <div class="task"><div class="task-n tn4">3</div><div class="task-text">Luego dramatiza <strong>"Guarda el resultado en Memoria"</strong>: Control toma el valor del Registro → lo lleva al archivador → lo guarda en la dirección indicada</div></div>
+              <div class="task"><div class="task-n tn4">4</div><div class="task-text">Explica qué es el <strong>Program Counter (PC)</strong>: la persona que lleva la cuenta de qué instrucción sigue</div></div>
+              <div class="task"><div class="task-n tn4">5</div><div class="task-text">Muestra el ciclo completo: <strong>Fetch</strong> (buscar instrucción) → <strong>Decode</strong> (entender) → <strong>Execute</strong> (ejecutar)</div></div>
+            </div>
+            <div class="slabel">// Roles de actuación</div>
+            <div class="concept-pills">
+              <span class="cp">🎩 Unidad de Control = jefe</span>
+              <span class="cp">🧮 ALU = calculadora</span>
+              <span class="cp">📂 Memoria = archivador</span>
+              <span class="cp">📋 Registro = pizarrón</span>
+              <span class="cp">🔢 PC = contador</span>
+            </div>
+            <div class="tip-box" style="margin-top:14px">
+              <strong>Consejo para la actuación:</strong> usen objetos físicos — una calculadora real para la ALU, una carpeta para la Memoria, y papeles con números para simular los datos. Mientras más dramático, más memorable para la clase.
+            </div>
+          </div>
+          <div class="card-right">
+            <div class="slabel">// Script de la dramatización</div>
+            <div class="guide-points">
+              <div class="gp"><div class="gp-icon">1️⃣</div><div class="gp-text"><strong>FETCH:</strong> El Jefe (CU) dice "necesito la instrucción #1" → va al archivador (Memoria) → saca el papel que dice "SUMA 5 + 3"</div></div>
+              <div class="gp"><div class="gp-icon">2️⃣</div><div class="gp-text"><strong>DECODE:</strong> El Jefe lee el papel y entiende: "hay que sumar. Los valores son 5 y 3. Los escribe en el pizarrón (Registros)"</div></div>
+              <div class="gp"><div class="gp-icon">3️⃣</div><div class="gp-text"><strong>EXECUTE:</strong> El Jefe le dice a la Calculadora (ALU): "suma lo que está en el pizarrón". La ALU dice "resultado: 8" y lo escribe en el pizarrón</div></div>
+              <div class="gp"><div class="gp-icon">4️⃣</div><div class="gp-text"><strong>STORE:</strong> El Jefe guarda el 8 en el archivador (Memoria) en la dirección indicada. El contador de instrucciones avanza al #2</div></div>
+              <div class="gp"><div class="gp-icon">🔁</div><div class="gp-text"><strong>Se repite</strong> para cada instrucción del programa. ¡Miles de millones de veces por segundo en una CPU real!</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="sol-note">🔒 Clave del docente para descargar la guía completa</div>
+          <div class="sol-form">
+            <input class="sol-input" id="si-4" type="password" placeholder="clave solución" onkeydown="if(event.key==='Enter')dlSol(4)">
+            <button class="btn-sol" onclick="dlSol(4)">⬇ Descargar guía</button>
+            <div class="sol-err" id="se-4" style="display:none">Clave incorrecta.</div>
+            <div class="sol-ok"  id="so-4" style="display:none">✓ Descargando guia_cpu_humana.txt…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ GRUPO 5 — RISC VS CISC ═══════════════ -->
+    <div class="card g5" id="card-5">
+      <div class="lock-overlay">
+        <div class="lock-icon">🟣</div>
+        <div class="lock-title">Misión 5 — RISC vs CISC</div>
+        <div class="lock-sub">Solo el Grupo 5 puede acceder</div>
+        <div class="lock-form">
+          <input class="lock-input" id="ai-5" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')unlock(5)">
+          <button class="btn-unlock" onclick="unlock(5)">Desbloquear →</button>
+        </div>
+        <div class="lock-err" id="ae-5" style="display:none">Clave incorrecta.</div>
+      </div>
+      <div class="card-content">
+        <div class="card-header">
+          <div class="group-badge gb5">🟪 GRUPO 5</div>
+          <div>
+            <div class="card-title">Misión: RISC vs CISC</div>
+            <div class="card-desc">Dos filosofías de diseño — instrucciones simples vs instrucciones complejas</div>
+          </div>
+          <div class="mission-badge">⚔️</div>
+        </div>
+        <div class="card-body">
+          <div class="card-left">
+            <div class="slabel">// Tu misión paso a paso</div>
+            <div class="mission-tasks">
+              <div class="task"><div class="task-n tn5">1</div><div class="task-text">Divide el grupo en DOS equipos: uno defiende <strong>RISC</strong> y otro defiende <strong>CISC</strong>. Cada equipo prepara sus argumentos</div></div>
+              <div class="task"><div class="task-n tn5">2</div><div class="task-text"><strong>Equipo RISC:</strong> pocas instrucciones (~100), todas simples, tamaño fijo, 1 ciclo de reloj. Ejemplos: <strong>ARM</strong> (iPhone, Android, Mac M1)</div></div>
+              <div class="task"><div class="task-n tn5">3</div><div class="task-text"><strong>Equipo CISC:</strong> muchas instrucciones (300-1000+), complejas, tamaño variable. Ejemplos: <strong>x86/x64</strong> (Intel, AMD — todas las PCs y laptops)</div></div>
+              <div class="task"><div class="task-n tn5">4</div><div class="task-text">Presenten una tabla comparativa con: número de instrucciones, ciclos por instrucción, consumo energético y uso actual</div></div>
+              <div class="task"><div class="task-n tn5">5</div><div class="task-text">Concluyan: ¿Cuál ganaría hoy en un teléfono celular? ¿Y en un servidor? ¿Por qué?</div></div>
+            </div>
+            <div class="slabel">// Conceptos que tu grupo debe dominar</div>
+            <div class="concept-pills">
+              <span class="cp">RISC = pocas instrucciones</span>
+              <span class="cp">CISC = instrucciones complejas</span>
+              <span class="cp">ARM vs x86</span>
+              <span class="cp">Pipeline</span>
+              <span class="cp">Consumo energético</span>
+            </div>
+          </div>
+          <div class="card-right">
+            <div class="slabel">// Tabla de batalla</div>
+            <div class="diagram-area">
+              <svg viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+                <!-- RISC side -->
+                <rect x="10" y="10" width="135" height="180" rx="8" fill="#1e1b4b" stroke="#A855F7" stroke-width="1.5"/>
+                <text x="77" y="30" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#A855F7">RISC</text>
+                <text x="77" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">ARM · MIPS · RISC-V</text>
+
+                <text x="20" y="68" font-family="JetBrains Mono" font-size="8" fill="#A855F7">▸ ~100 instrucciones</text>
+                <text x="20" y="84" font-family="JetBrains Mono" font-size="8" fill="#A855F7">▸ Tamaño fijo (32 bits)</text>
+                <text x="20" y="100" font-family="JetBrains Mono" font-size="8" fill="#A855F7">▸ 1 ciclo por instrucción</text>
+                <text x="20" y="116" font-family="JetBrains Mono" font-size="8" fill="#A855F7">▸ Bajo consumo</text>
+                <text x="20" y="132" font-family="JetBrains Mono" font-size="8" fill="#A855F7">▸ Muchos registros</text>
+
+                <rect x="20" y="150" width="115" height="30" rx="4" fill="#0D1117" stroke="#A855F7" stroke-width="1"/>
+                <text x="77" y="162" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#E6EDF3">iPhone, Android</text>
+                <text x="77" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#E6EDF3">Mac M1/M2/M3</text>
+
+                <!-- VS -->
+                <text x="160" y="110" text-anchor="middle" font-family="JetBrains Mono" font-size="16" font-weight="700" fill="#8B949E">VS</text>
+
+                <!-- CISC side -->
+                <rect x="175" y="10" width="135" height="180" rx="8" fill="#1e1b4b" stroke="#818CF8" stroke-width="1.5"/>
+                <text x="242" y="30" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#818CF8">CISC</text>
+                <text x="242" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">x86 · x64 (Intel · AMD)</text>
+
+                <text x="185" y="68" font-family="JetBrains Mono" font-size="8" fill="#818CF8">▸ 300-1000 instrucciones</text>
+                <text x="185" y="84" font-family="JetBrains Mono" font-size="8" fill="#818CF8">▸ Tamaño variable</text>
+                <text x="185" y="100" font-family="JetBrains Mono" font-size="8" fill="#818CF8">▸ 1-20 ciclos</text>
+                <text x="185" y="116" font-family="JetBrains Mono" font-size="8" fill="#818CF8">▸ Mayor consumo</text>
+                <text x="185" y="132" font-family="JetBrains Mono" font-size="8" fill="#818CF8">▸ Pocos registros</text>
+
+                <rect x="185" y="150" width="115" height="30" rx="4" fill="#0D1117" stroke="#818CF8" stroke-width="1"/>
+                <text x="242" y="162" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#E6EDF3">PCs · Laptops</text>
+                <text x="242" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#E6EDF3">Servidores</text>
+              </svg>
+            </div>
+            <div class="slabel">// Guía para tu exposición</div>
+            <div class="guide-points">
+              <div class="gp"><div class="gp-icon">⚔️</div><div class="gp-text"><strong>Debate:</strong> cada sub-equipo defiende su arquitectura con los argumentos de la tabla</div></div>
+              <div class="gp"><div class="gp-icon">📱</div><div class="gp-text"><strong>Teléfono:</strong> RISC gana — bajo consumo es crítico para la batería. ARM domina el 99% de los smartphones</div></div>
+              <div class="gp"><div class="gp-icon">🖥️</div><div class="gp-text"><strong>PC:</strong> CISC (x86) domina — compatibilidad con décadas de software. Internamente implementan RISC micro-ops</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="sol-note">🔒 Clave del docente para descargar la guía completa</div>
+          <div class="sol-form">
+            <input class="sol-input" id="si-5" type="password" placeholder="clave solución" onkeydown="if(event.key==='Enter')dlSol(5)">
+            <button class="btn-sol" onclick="dlSol(5)">⬇ Descargar guía</button>
+            <div class="sol-err" id="se-5" style="display:none">Clave incorrecta.</div>
+            <div class="sol-ok"  id="so-5" style="display:none">✓ Descargando guia_risc_cisc.txt…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /groups -->
+</div><!-- /wrap -->
+
+<footer>
+  ITB — Instituto Tecnológico de Negocios &nbsp;·&nbsp; <span>Taller — Arquitectura de Computadoras</span> · Semana 1
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── UNLOCK ── */
+function unlock(n) {
+  const inp = document.getElementById(`ai-${n}`);
+  const err = document.getElementById(`ae-${n}`);
+  if (inp.value.trim() === ACCESS_PASSWORDS[n]) {
+    const card = document.getElementById(`card-${n}`);
+    card.classList.add('unlocked');
+    card.scrollIntoView({behavior:'smooth',block:'start'});
+    showToast(`✓ Misión ${n} desbloqueada`);
+  } else {
+    inp.classList.add('err');
+    err.style.display = 'block';
+    setTimeout(()=>inp.classList.remove('err'),400);
+    inp.value=''; inp.focus();
+  }
+}
+
+/* ── SOLUTIONS ── */
+const solutions = {
+  1:{file:'guia_vonneumann.txt',content:`GUÍA COMPLETA — MISIÓN 1: MÁQUINA VON NEUMANN
+Arquitectura de Computadoras · ITB · Semana 1
+==============================================
+
+CONCEPTO CENTRAL
+La arquitectura Von Neumann (1945) define que DATOS e INSTRUCCIONES
+comparten la MISMA memoria y el MISMO bus de comunicación.
+
+COMPONENTES CLAVE
+• CPU: contiene CU (Unidad de Control) + ALU + Registros
+• Memoria única: guarda programa Y datos en el mismo espacio
+• Bus único: único canal de comunicación entre CPU y Memoria
+• Unidad E/S: periféricos (teclado, pantalla, etc.)
+
+CICLO DE INSTRUCCIÓN
+1. FETCH   → CPU solicita instrucción a memoria por el bus
+2. DECODE  → Unidad de Control interpreta la instrucción
+3. EXECUTE → ALU ejecuta la operación
+4. Repite para la siguiente instrucción (PC++)
+
+EL CUELLO DE BOTELLA
+El bus único significa que la CPU NO puede:
+  - Buscar instrucciones Y datos al mismo tiempo
+  - Debe esperar: primero instrucción, luego datos
+  → Esto LIMITA la velocidad máxima del sistema
+
+EJEMPLO DEL CUELLO DE BOTELLA
+Instrucción: "Suma el contenido de la dirección 0x100"
+  Paso 1: CPU pide la instrucción (usa el bus)
+  Paso 2: CPU pide el dato en 0x100 (usa el mismo bus)
+  → No pueden ocurrir simultáneamente = cuello de botella
+
+USOS EN LA VIDA REAL
+• Computadoras de escritorio (PC)
+• Laptops y notebooks
+• Servidores
+• La mayoría de computadoras de propósito general
+
+PREGUNTAS PARA TU PRESENTACIÓN
+Q: ¿Qué construyeron?
+A: Una máquina Von Neumann con memoria única para datos e instrucciones
+
+Q: ¿Cómo fluye la información?
+A: CPU ↔ bus único ↔ memoria (instrucciones y datos juntos)
+
+Q: ¿Qué arquitectura representa?
+A: Von Neumann — el modelo base de casi todas las computadoras actuales
+
+Q: ¿Dónde se usa en la vida real?
+A: Todas las PCs, laptops y servidores del mundo
+
+DATO EXTRA (para impresionar)
+Los procesadores modernos Intel/AMD tienen Von Neumann externamente
+(RAM compartida) pero usan cachés separadas L1-I y L1-D internamente
+(Harvard modificada) para superar el cuello de botella.
+`},
+  2:{file:'guia_harvard.txt',content:`GUÍA COMPLETA — MISIÓN 2: MÁQUINA HARVARD
+Arquitectura de Computadoras · ITB · Semana 1
+==============================================
+
+CONCEPTO CENTRAL
+La arquitectura Harvard separa FÍSICAMENTE la memoria de instrucciones
+y la memoria de datos, cada una con su propio bus independiente.
+
+DIFERENCIA CLAVE CON VON NEUMANN
+Von Neumann: 1 memoria + 1 bus (cuello de botella)
+Harvard:     2 memorias + 2 buses (acceso paralelo)
+
+COMPONENTES
+• CPU: CU + ALU + Registros
+• Memoria de Instrucciones: solo guarda el programa (Flash en MCU)
+• Memoria de Datos: solo guarda variables y resultados (SRAM en MCU)
+• Bus de Instrucciones: exclusivo para buscar instrucciones
+• Bus de Datos: exclusivo para leer/escribir datos
+
+VENTAJA PRINCIPAL
+La CPU puede buscar la siguiente instrucción Y leer datos
+AL MISMO TIEMPO porque los buses son independientes.
+→ Elimina el cuello de botella de Von Neumann
+→ Mayor velocidad con el mismo hardware
+
+HARVARD MODIFICADA
+Los procesadores Intel/AMD modernos usan una variante:
+- Externamente: Von Neumann (una sola RAM)
+- Internamente: Harvard (caché L1-I para instrucciones, L1-D para datos)
+→ Obtienen velocidad de Harvard con compatibilidad de Von Neumann
+
+USOS EN LA VIDA REAL
+• Microcontroladores PIC, AVR (Arduino)
+• Procesadores de señal digital (DSP)
+• Procesadores de audio y video en tiempo real
+• ESP32, STM32 y otros MCU modernos
+
+PREGUNTAS PARA TU PRESENTACIÓN
+Q: ¿Qué construyeron?
+A: Una máquina Harvard con memorias y buses separados
+
+Q: ¿Cómo fluye la información?
+A: CPU ↔ Bus inst. ↔ Mem. Instrucciones (paralelo con el otro bus)
+   CPU ↔ Bus datos ↔ Mem. Datos
+
+Q: ¿Qué arquitectura representa?
+A: Harvard — diseñada para mayor velocidad sin cuello de botella
+
+Q: ¿Dónde se usa en la vida real?
+A: Microcontroladores (Arduino, PIC), chips de audio/video, DSP
+`},
+  3:{file:'guia_microcontrolador.txt',content:`GUÍA COMPLETA — MISIÓN 3: MICROCONTROLADOR
+Arquitectura de Computadoras · ITB · Semana 1
+==============================================
+
+CONCEPTO CENTRAL
+Un microcontrolador (MCU) es un sistema computacional COMPLETO
+en un solo chip: CPU + Memoria + Periféricos integrados.
+
+DIFERENCIA CON MICROPROCESADOR
+Microprocesador:  Solo la CPU — necesita chips externos para todo
+Microcontrolador: CPU + RAM + Flash + GPIO + Timers + UART en UN chip
+
+COMPONENTES INTERNOS (en el mismo chip)
+• CPU (CU + ALU + Registros): ejecuta el programa
+• Flash (no volátil): guarda el programa permanentemente (32KB-4MB)
+• SRAM (volátil): datos temporales en ejecución (2KB-512KB)
+• GPIO (General Purpose I/O): pines de entrada/salida digitales
+• ADC/DAC: convierte señales analógicas a digitales y viceversa
+• Timers: temporización y generación de señales PWM
+• UART/SPI/I²C: protocolos de comunicación serie
+
+ARQUITECTURA INTERNA
+• Usa Harvard (memorias Flash y SRAM separadas)
+• Bus interno conecta todos los componentes
+• Bajo consumo: diseñado para funcionar con pilas
+
+EJEMPLOS REALES
+Arduino Uno (ATmega328P):
+  - CPU: AVR 8-bit a 16 MHz
+  - Flash: 32 KB (programa)
+  - SRAM: 2 KB (datos)
+  - 14 pines GPIO, 6 ADC, UART/SPI/I²C
+
+ESP32 (Espressif):
+  - CPU: Dual-core Xtensa 32-bit a 240 MHz
+  - Flash: 4 MB, SRAM: 520 KB
+  - WiFi + Bluetooth integrados
+  - 34 GPIO, 18 ADC, múltiples UART/SPI/I²C
+
+FLUJO DE INFORMACIÓN (ejemplo semáforo)
+1. Flash tiene el programa: "Verde 30s → Amarillo 3s → Rojo 30s"
+2. CPU lee instrucción de Flash (Harvard: bus instrucciones)
+3. CPU cuenta tiempo con Timer interno
+4. CPU escribe en registro GPIO para encender el LED correcto
+5. GPIO envía señal eléctrica al pin de salida → enciende LED
+6. Repite para siempre (loop infinito en el programa)
+
+VENTAJAS DEL MCU
+• Costo: $1 - $10 USD
+• Consumo: milivatios (funciona con pilas por años)
+• Tamaño: milímetros
+• Todo en uno: no necesita placa madre ni chips externos
+
+USOS EN LA VIDA REAL
+Semáforos, microondas, lavadoras, termostatos, cerraduras electrónicas,
+control de motores, sensores IoT, alarmas, drones, robots educativos.
+`},
+  4:{file:'guia_cpu_humana.txt',content:`GUÍA COMPLETA — MISIÓN 4: CPU HUMANA
+Arquitectura de Computadoras · ITB · Semana 1
+==============================================
+
+CONCEPTO CENTRAL
+Simular el funcionamiento de un procesador con personas,
+donde cada miembro del grupo representa un componente real de la CPU.
+
+ROLES DE ACTUACIÓN
+🎩 UNIDAD DE CONTROL (el Jefe)
+   - Da órdenes a todos los demás componentes
+   - Lee e interpreta las instrucciones del programa
+   - Controla el flujo de datos entre componentes
+   - Tiene el Program Counter (cuenta qué instrucción sigue)
+
+🧮 ALU (la Calculadora)
+   - Solo sabe hacer operaciones: +, -, *, /, AND, OR, NOT
+   - Recibe operandos del Registro y devuelve el resultado
+   - No piensa, solo calcula cuando el Jefe lo pide
+
+📂 MEMORIA (el Archivador)
+   - Guarda tanto el programa (instrucciones) como los datos
+   - Organizada en "cajitas" numeradas (direcciones de memoria)
+   - Responde cuando el Jefe pide leer o escribir algo
+
+📋 REGISTRO (el Pizarrón)
+   - Memoria ultrarrápida dentro de la CPU
+   - Guarda temporalmente los datos en uso inmediato
+   - Se borra y reescribe constantemente
+
+SCRIPT DE DRAMATIZACIÓN
+
+INSTRUCCIÓN 1: "Carga el valor 5 al Registro 1"
+  [Jefe]: "Fetch! Saco la instrucción #1 del archivador"
+  [Archivador]: "Aquí está: LOAD R1, 5"
+  [Jefe]: "Decode! Entiendo: poner el número 5 en el pizarrón R1"
+  [Jefe]: "Execute! Pizarrón, escribe 5 en el espacio R1"
+  [Pizarrón]: [escribe 5 en R1]
+
+INSTRUCCIÓN 2: "Carga el valor 3 al Registro 2"
+  [Jefe]: "Fetch! Instrucción #2 del archivador"
+  [Archivador]: "LOAD R2, 3"
+  [Pizarrón]: [escribe 3 en R2]
+
+INSTRUCCIÓN 3: "Suma R1 + R2, guarda en R3"
+  [Jefe]: "Fetch! Instrucción #3"
+  [Archivador]: "ADD R3, R1, R2"
+  [Jefe]: "Decode! Hay que sumar. Calculadora, suma R1 y R2"
+  [Jefe mira el pizarrón]: "R1=5, R2=3"
+  [Calculadora]: "5 + 3 = 8"
+  [Jefe]: "Execute! Pizarrón, escribe 8 en R3"
+  [Pizarrón]: [escribe 8 en R3]
+
+INSTRUCCIÓN 4: "Guarda R3 en Memoria dirección 100"
+  [Jefe]: "STORE! Archivador, en la cajita 100 escribe el valor de R3"
+  [Jefe mira el pizarrón]: "R3 = 8"
+  [Archivador]: [escribe 8 en la posición 100]
+
+CICLO COMPLETO
+FETCH (buscar) → DECODE (entender) → EXECUTE (ejecutar) → repite
+
+DATO IMPACTANTE
+Una CPU real ejecuta este ciclo 3,000,000,000 veces por segundo
+(3 GHz). En el tiempo que tardas en parpadear, la CPU ha
+ejecutado 300 millones de instrucciones.
+`},
+  5:{file:'guia_risc_cisc.txt',content:`GUÍA COMPLETA — MISIÓN 5: RISC VS CISC
+Arquitectura de Computadoras · ITB · Semana 1
+==============================================
+
+CONCEPTO CENTRAL
+Dos filosofías de diseño para el juego de instrucciones (ISA):
+RISC = pocas instrucciones simples | CISC = muchas instrucciones complejas
+
+RISC — Reduced Instruction Set Computer
+• ~50-200 instrucciones totales
+• Todas las instrucciones tienen el MISMO tamaño (32 bits)
+• Cada instrucción se ejecuta en 1 ciclo de reloj
+• Pipeline eficiente: siempre hay instrucciones en procesamiento
+• Muchos registros de propósito general
+• Hardware más simple → menor costo y consumo
+• EJEMPLOS: ARM (iPhone, Android, Mac M1/M2/M3), MIPS, RISC-V
+
+CISC — Complex Instruction Set Computer
+• 300-1000+ instrucciones totales
+• Instrucciones de tamaño VARIABLE (1 a 15 bytes en x86)
+• Algunas instrucciones toman 1-20 ciclos de reloj
+• Una instrucción puede: acceder a memoria + calcular + guardar
+• Menos registros pero muy especializados
+• Hardware más complejo → mayor consumo
+• EJEMPLOS: x86/x64 (Intel Core, AMD Ryzen) — todas las PCs
+
+TABLA COMPARATIVA
+Característica     | RISC              | CISC
+Instrucciones      | ~100              | 300-1000+
+Tamaño instrucción | Fijo (32 bits)    | Variable (1-15 bytes)
+Ciclos/instrucción | 1                 | 1-20
+Registros          | Muchos (~32)      | Pocos (~8-16)
+Consumo energético | Bajo              | Alto
+Uso dominante      | Móviles, IoT      | PCs, Servidores
+
+CONCLUSIÓN DEL DEBATE
+¿Teléfono celular? → RISC (ARM) gana
+  Razón: la batería es limitada. ARM consume 10x menos energía.
+  Hoy el 99% de smartphones usan ARM.
+
+¿PC o Servidor? → CISC (x86) domina por COMPATIBILIDAD
+  Razón: décadas de software x86. No puede cambiar fácilmente.
+  Internamente, los Intel/AMD modernos dividen instrucciones
+  CISC en micro-operaciones RISC (lo mejor de ambos mundos).
+
+¿Futuro? → RISC-V (código abierto) crece rápidamente
+  Apple M1/M2/M3 (ARM RISC) superan en eficiencia a Intel x86.
+  Los servidores en la nube están adoptando ARM (AWS Graviton).
+
+DATO IMPACTANTE
+El Apple M1 (ARM RISC, 2020) fue más rápido y eficiente que
+los mejores Intel x86 disponibles en ese momento, usando
+menos de la mitad de energía. Marcó el inicio del cambio.
+`}
+};
+
+function dlSol(n) {
+  const inp = document.getElementById(`si-${n}`);
+  const err = document.getElementById(`se-${n}`);
+  const ok  = document.getElementById(`so-${n}`);
+  err.style.display = ok.style.display = 'none';
+
+  if (inp.value.trim() === SOLUTION_PASSWORD) {
+    const {file, content} = solutions[n];
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
+    a.download = file; a.click();
+    ok.style.display = 'block';
+    showToast(`✓ ${file} descargado`);
+  } else {
+    inp.classList.add('err');
+    err.style.display = 'block';
+    setTimeout(()=>inp.classList.remove('err'),400);
+    inp.value=''; inp.focus();
+  }
+}
+
+/* ── TIMER ── */
+let sec=0,iv=null,run=false;
+function tStart(){if(run)return;run=true;document.getElementById('tbs').classList.add('on');
+  iv=setInterval(()=>{sec++;document.getElementById('td').textContent=
+    String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');},1000);}
+function tPause(){clearInterval(iv);run=false;document.getElementById('tbs').classList.remove('on');}
+function tReset(){tPause();sec=0;document.getElementById('td').textContent='00:00';}
+
+/* ── TOAST ── */
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html>
