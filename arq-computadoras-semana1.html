@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura de Computadoras — Semana 1 · ITB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1117;--surface:#161B22;--surface2:#1C2129;--border:#21262D;
+  --cyan:#06B6D4;--cyan-dim:#062830;--cyan-mid:rgba(6,182,212,.15);
+  --indigo:#818CF8;--indigo-dim:#1e1b4b;
+  --green:#4ADE80;--green-dim:#1a4731;
+  --amber:#F59E0B;--amber-dim:#2d2208;
+  --red:#FF7B72;--muted:#8B949E;--text:#E6EDF3;
+  --radius:10px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* ── GRID BACKGROUND ── */
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(6,182,212,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(6,182,212,.025) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;
+  justify-content:space-between;padding:0 2rem;height:56px;gap:12px}
+.nav-brand{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+  color:var(--cyan);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.nav-brand .sep{color:var(--border)}
+.nav-brand .dim{color:var(--muted);font-weight:400}
+.nav-progress{display:flex;gap:4px;align-items:center}
+.np-dot{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s}
+.np-dot.done{background:var(--cyan)}
+.nav-badge{font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:var(--cyan-dim);border:1px solid rgba(6,182,212,.4);
+  color:var(--cyan);padding:3px 12px;border-radius:20px;white-space:nowrap}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;max-width:960px;margin:0 auto;
+  padding:64px 1.5rem 52px;text-align:center}
+.hero-chip{display:inline-flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.hero-chip::before,.hero-chip::after{content:'';width:36px;height:1px;background:var(--border)}
+.hero h1{font-family:'JetBrains Mono',monospace;
+  font-size:clamp(2rem,5.5vw,3.6rem);font-weight:700;line-height:1.08;margin-bottom:10px}
+.hero h1 .ac{color:var(--cyan)}
+.hero h1 .dm{color:var(--muted);font-weight:300}
+.hero-sub{font-family:'JetBrains Mono',monospace;font-size:clamp(.85rem,2vw,1.15rem);
+  color:var(--muted);margin-bottom:18px}
+.hero p{color:var(--muted);font-size:15px;max-width:560px;margin:0 auto 36px}
+.hero-meta{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;
+  color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px}
+.hero-meta span{display:flex;align-items:center;gap:6px}
+.hm-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+
+/* ── WRAP ── */
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 1.5rem}
+
+/* ── PROGRESS BAR ── */
+.progress-strip{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 24px;margin-bottom:40px;
+  display:flex;flex-direction:column;gap:10px}
+.ps-label{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  display:flex;justify-content:space-between}
+.ps-label span{color:var(--cyan)}
+.ps-track{background:var(--surface2);border-radius:20px;height:6px;overflow:hidden}
+.ps-fill{background:linear-gradient(90deg,var(--cyan),var(--indigo));
+  height:100%;border-radius:20px;width:0%;transition:width .6s ease}
+.ps-topics{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ps-topic{font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:3px 9px;border-radius:4px;cursor:pointer;transition:all .2s;
+  background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.ps-topic.done{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+
+/* ── SECTION ACCORDION ── */
+.section-block{margin-bottom:12px;border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;transition:border-color .25s}
+.section-block.active{border-color:var(--cyan)}
+.section-block.visited{border-color:rgba(6,182,212,.25)}
+
+.section-header{display:flex;align-items:center;gap:14px;padding:18px 22px;
+  cursor:pointer;user-select:none;transition:background .2s}
+.section-header:hover{background:var(--surface2)}
+.section-block.active .section-header{background:var(--cyan-dim)}
+
+.sh-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  color:var(--muted);background:var(--surface2);border:1px solid var(--border);
+  min-width:32px;height:32px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}
+.section-block.active .sh-num{color:var(--cyan);background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.4)}
+.section-block.visited .sh-num{color:var(--cyan);border-color:rgba(6,182,212,.3)}
+
+.sh-info{flex:1}
+.sh-label{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.sh-title{font-size:16px;font-weight:700}
+.sh-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.sh-tag{font-family:'JetBrains Mono',monospace;font-size:10px;
+  padding:2px 7px;border-radius:3px;
+  background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.sh-toggle{font-size:18px;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.section-block.active .sh-toggle{transform:rotate(180deg);color:var(--cyan)}
+
+.section-body{display:none;padding:24px 24px 28px;border-top:1px solid var(--border)}
+.section-block.active .section-body{display:block}
+
+/* ── CONTENT ELEMENTS ── */
+.concept-lead{font-size:15px;color:var(--text);line-height:1.75;margin-bottom:20px}
+.concept-lead strong{color:var(--cyan)}
+.concept-lead em{color:var(--indigo);font-style:normal}
+
+.key-fact{background:var(--cyan-dim);border:1px solid rgba(6,182,212,.3);
+  border-radius:8px;padding:13px 17px;margin:16px 0;
+  display:flex;gap:10px;align-items:flex-start}
+.kf-icon{color:var(--cyan);font-size:16px;flex-shrink:0}
+.kf-text{font-size:13px;color:var(--text);line-height:1.6}
+.kf-text strong{color:var(--cyan)}
+
+.warn-fact{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);
+  border-radius:8px;padding:13px 17px;margin:16px 0;
+  display:flex;gap:10px;align-items:flex-start}
+.wf-text{font-size:13px;color:var(--muted);line-height:1.6}
+.wf-text strong{color:var(--amber)}
+
+/* ── COMPARE TABLE ── */
+.compare-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.compare-table th{background:var(--surface2);color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:10px 14px;border:1px solid var(--border);text-align:left}
+.compare-table td{padding:10px 14px;border:1px solid var(--border);
+  vertical-align:top;line-height:1.55}
+.compare-table tr:hover td{background:var(--surface2)}
+.td-hl{color:var(--cyan);font-weight:600;font-family:'JetBrains Mono',monospace}
+.td-in{color:var(--indigo);font-weight:600;font-family:'JetBrains Mono',monospace}
+
+/* ── GENERATIONS TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;margin:16px 0;
+  border-left:2px solid var(--border);padding-left:20px}
+.tl-item{padding:12px 0 12px 4px;position:relative}
+.tl-item::before{content:'';position:absolute;left:-27px;top:18px;
+  width:10px;height:10px;border-radius:50%;background:var(--surface2);
+  border:2px solid var(--border);transition:all .2s}
+.tl-item:hover::before{border-color:var(--cyan);background:var(--cyan-dim)}
+.tl-gen{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  color:var(--cyan);margin-bottom:3px}
+.tl-title{font-size:14px;font-weight:600;margin-bottom:3px}
+.tl-desc{font-size:13px;color:var(--muted);line-height:1.5}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  margin-top:3px}
+
+/* ── CPU DIAGRAM SVG container ── */
+.diagram-wrap{background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:20px;margin:16px 0;overflow-x:auto;text-align:center}
+.diagram-wrap svg{max-width:100%;height:auto}
+
+/* ── COMPONENT GRID ── */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:12px;margin:16px 0}
+.comp-card{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:14px 16px;transition:border-color .2s}
+.comp-card:hover{border-color:var(--cyan)}
+.cc-icon{font-size:22px;margin-bottom:8px}
+.cc-name{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+  color:var(--cyan);margin-bottom:5px}
+.cc-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── ISA TABLE ── */
+.isa-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.isa-table th{background:rgba(6,182,212,.1);color:var(--cyan);
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:9px 14px;border:1px solid rgba(6,182,212,.2);text-align:left}
+.isa-table td{padding:9px 14px;border:1px solid var(--border);
+  vertical-align:middle;line-height:1.5}
+.isa-table tr:nth-child(even) td{background:var(--surface2)}
+.isa-cmd{font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--cyan);font-weight:700}
+
+/* ── SEC TAG ── */
+.sec-tag{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-tag::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── MEMORY HIERARCHY ── */
+.mem-pyramid{display:flex;flex-direction:column;gap:0;align-items:center;
+  margin:16px 0;max-width:420px}
+.mem-layer{border-radius:4px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:4px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+  padding:9px 0;transition:all .2s;cursor:default}
+.mem-layer:hover{filter:brightness(1.15)}
+.ml-1{width:30%;background:rgba(6,182,212,.3);border:1px solid var(--cyan);color:var(--cyan)}
+.ml-2{width:50%;background:rgba(129,140,248,.25);border:1px solid var(--indigo);color:var(--indigo)}
+.ml-3{width:70%;background:rgba(74,222,128,.2);border:1px solid var(--green);color:var(--green)}
+.ml-4{width:90%;background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber)}
+.ml-5{width:100%;background:rgba(139,148,158,.1);border:1px solid var(--muted);color:var(--muted)}
+.mem-labels{display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);
+  width:100%;margin-top:8px}
+
+/* ── BUS DIAGRAM ── */
+.bus-diagram{background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:18px;margin:16px 0;overflow-x:auto}
+
+/* ── RISC CISC PILLS ── */
+.arch-pills{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.arch-pill{flex:1;min-width:200px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.ap-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.ap-label.risc{color:var(--cyan)}
+.ap-label.cisc{color:var(--indigo)}
+.ap-items{list-style:none;display:flex;flex-direction:column;gap:5px}
+.ap-items li{font-size:13px;color:var(--muted);display:flex;gap:6px}
+.ap-items li::before{content:'▸';flex-shrink:0;margin-top:2px}
+.ap-items li.risc-li::before{color:var(--cyan)}
+.ap-items li.cisc-li::before{color:var(--indigo)}
+
+/* ── DL BUTTON ── */
+.btn-dl{display:inline-flex;align-items:center;gap:7px;
+  background:var(--cyan);color:#0D1117;
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:13px;padding:9px 20px;border-radius:7px;
+  border:none;cursor:pointer;transition:opacity .2s,transform .15s;margin-top:8px}
+.btn-dl:hover{opacity:.85;transform:translateY(-1px)}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);
+  padding:28px 2rem;text-align:center;color:var(--muted);
+  font-size:13px;font-family:'JetBrains Mono',monospace;margin-top:60px}
+footer span{color:var(--cyan)}
+
+@media(max-width:600px){
+  nav{padding:0 1rem}.nav-brand .dim{display:none}
+  .hero h1{font-size:2rem}
+  .section-header{padding:14px 16px}
+  .section-body{padding:18px 16px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M9 2v2M15 20v2M9 20v2M2 15h2M2 9h2M20 15h2M20 9h2"/></svg>
+    ITB <span class="sep">/</span> <span class="dim">arq-computadoras</span> <span class="sep">/</span> semana-1
+  </div>
+  <div class="nav-progress" id="nav-dots"></div>
+  <div class="nav-badge">⬡ Semana 1 — 12 temas</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">Instituto Tecnológico de Negocios · Semana 1 de 2</div>
+  <h1>
+    <span class="dm">Arquitectura de</span><br>
+    <span class="ac">Computadoras</span>
+  </h1>
+  <div class="hero-sub">Desde los tubos de vacío hasta los microcontroladores modernos</div>
+  <p>12 temas organizados para proyectar en clase. Haz clic en cada bloque para expandirlo, y marca los temas a medida que avanzas.</p>
+  <div class="hero-meta">
+    <span><span class="hm-dot"></span>12 temas</span>
+    <span><span class="hm-dot"></span>Semana 1</span>
+    <span><span class="hm-dot"></span>Teoría + Diagramas</span>
+    <span><span class="hm-dot"></span>Sin código</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PROGRESS -->
+  <div class="progress-strip">
+    <div class="ps-label">
+      <span>Progreso de la clase</span>
+      <span id="ps-count">0 / 12 temas</span>
+    </div>
+    <div class="ps-track"><div class="ps-fill" id="ps-fill"></div></div>
+    <div class="ps-topics" id="ps-topics"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 1 — INTRODUCCIÓN GENERAL
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s1">
+    <div class="section-header" onclick="toggle(1)">
+      <div class="sh-num">01</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 1 — Contexto</div>
+        <div class="sh-title">Introducción general</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Hardware</span>
+          <span class="sh-tag">Software</span>
+          <span class="sh-tag">Firmware</span>
+          <span class="sh-tag">Sistema computacional</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">La <strong>arquitectura de computadoras</strong> es la ciencia que estudia cómo se diseñan, organizan y conectan los componentes de un sistema computacional para que puedan procesar información de manera eficiente. Es el "plano" que define cómo funciona una computadora por dentro.</p>
+
+      <div class="sec-tag">// Los tres niveles de un sistema computacional</div>
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="cc-icon">🔩</div>
+          <div class="cc-name">Hardware</div>
+          <div class="cc-desc">Componentes físicos y tangibles: procesador, memoria RAM, disco duro, tarjeta gráfica, placa madre. Todo lo que puedes tocar.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">💻</div>
+          <div class="cc-name">Software</div>
+          <div class="cc-desc">Programas e instrucciones que le dicen al hardware qué hacer. Incluye el sistema operativo, aplicaciones y código Python que ya conoces.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">⚡</div>
+          <div class="cc-name">Firmware</div>
+          <div class="cc-desc">Software de bajo nivel grabado directamente en un chip de hardware. Intermedio entre los dos: el BIOS de tu PC es firmware. No se puede modificar fácilmente.</div>
+        </div>
+      </div>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Analogía clave:</strong> el hardware es el cuerpo, el software es la mente, y el firmware es el instinto — respuestas básicas programadas que el sistema necesita para arrancar.</div>
+      </div>
+
+      <div class="sec-tag">// ¿Qué es un sistema computacional?</div>
+      <p class="concept-lead">Un <strong>sistema computacional</strong> es el conjunto integrado de hardware, software y firmware que trabajan juntos para recibir <em>entrada</em>, <em>procesar</em> información y producir una <em>salida</em>. No es solo la CPU — es el ecosistema completo.</p>
+
+      <table class="compare-table">
+        <tr><th>Componente</th><th>Rol</th><th>Ejemplo</th></tr>
+        <tr><td class="td-hl">Entrada</td><td>Recibe datos del usuario o del entorno</td><td>Teclado, mouse, sensores</td></tr>
+        <tr><td class="td-hl">Procesamiento</td><td>Transforma y calcula con los datos</td><td>CPU, GPU</td></tr>
+        <tr><td class="td-hl">Almacenamiento</td><td>Guarda datos e instrucciones</td><td>RAM, SSD, HDD</td></tr>
+        <tr><td class="td-hl">Salida</td><td>Presenta los resultados al usuario</td><td>Monitor, impresora, altavoces</td></tr>
+        <tr><td class="td-hl">Comunicación</td><td>Conecta el sistema con otros</td><td>Tarjeta de red, Bluetooth</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 2 — EVOLUCIÓN
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s2">
+    <div class="section-header" onclick="toggle(2)">
+      <div class="sh-num">02</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 2 — Historia</div>
+        <div class="sh-title">Evolución de las computadoras</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Generaciones</span>
+          <span class="sh-tag">Tubos de vacío</span>
+          <span class="sh-tag">Transistores</span>
+          <span class="sh-tag">Microprocesadores</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">La historia de las computadoras se divide en <strong>cinco generaciones</strong>, cada una marcada por un salto tecnológico que redujo el tamaño, aumentó la velocidad y bajó el costo drásticamente. Esta historia justifica por qué la arquitectura actual es como es.</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-gen">1ª Generación</div>
+          <div class="tl-title">Tubos de vacío</div>
+          <div class="tl-desc">Computadoras del tamaño de una habitación. Generaban calor extremo y fallaban constantemente. La ENIAC usaba 18,000 tubos.</div>
+          <div class="tl-year">1940 — 1956</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-gen">2ª Generación</div>
+          <div class="tl-title">Transistores</div>
+          <div class="tl-desc">Reemplazaron los tubos: más pequeños, más rápidos, menos calor. Surgieron los primeros lenguajes de programación (COBOL, FORTRAN).</div>
+          <div class="tl-year">1956 — 1963</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-gen">3ª Generación</div>
+          <div class="tl-title">Circuitos integrados (IC)</div>
+          <div class="tl-desc">Miles de transistores en un solo chip de silicio. Aparecen los sistemas operativos y el concepto de "tiempo compartido".</div>
+          <div class="tl-year">1964 — 1971</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-gen">4ª Generación</div>
+          <div class="tl-title">Microprocesadores</div>
+          <div class="tl-desc">Toda la CPU en un solo chip (Intel 4004, 1971). Nace la computadora personal (PC). La Ley de Moore predice que los transistores se duplican cada 2 años.</div>
+          <div class="tl-year">1971 — 2010</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-gen">5ª Generación</div>
+          <div class="tl-title">IA, computación cuántica, microcontroladores</div>
+          <div class="tl-desc">Arquitecturas especializadas para IA (TPU de Google, GPU de NVIDIA). IoT, computación en la nube y chips integrados en todo dispositivo.</div>
+          <div class="tl-year">2010 — Presente</div>
+        </div>
+      </div>
+
+      <div class="key-fact">
+        <div class="kf-icon">📐</div>
+        <div class="kf-text"><strong>Ley de Moore (1965):</strong> el número de transistores en un chip se duplica aproximadamente cada dos años, manteniendo el mismo costo. Esta tendencia ha impulsado el avance tecnológico durante décadas, aunque hoy está llegando a sus límites físicos.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 3 — PROCESADOR
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s3">
+    <div class="section-header" onclick="toggle(3)">
+      <div class="sh-num">03</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 3</div>
+        <div class="sh-title">El Procesador (CPU)</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Central Processing Unit</span>
+          <span class="sh-tag">Ciclo Fetch-Decode-Execute</span>
+          <span class="sh-tag">Velocidad de reloj</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">El <strong>procesador o CPU</strong> (Central Processing Unit) es el cerebro del sistema computacional. Se encarga de ejecutar instrucciones: leer un dato, sumar dos números, comparar valores, escribir un resultado. Todo lo que un programa hace, pasa por la CPU.</p>
+
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="cc-icon">⏱️</div>
+          <div class="cc-name">Velocidad de reloj</div>
+          <div class="cc-desc">Medida en GHz (gigahercios). Un procesador a 3 GHz ejecuta 3,000 millones de ciclos por segundo. Cada ciclo puede procesar una o más instrucciones.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">🔢</div>
+          <div class="cc-name">Núcleos (cores)</div>
+          <div class="cc-desc">Un procesador moderno tiene múltiples núcleos (2, 4, 8, 16+). Cada núcleo es una CPU independiente que puede ejecutar tareas en paralelo.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">📏</div>
+          <div class="cc-name">Tamaño del proceso</div>
+          <div class="cc-desc">Se mide en nanómetros (nm). Un chip de 5nm tiene transistores de 5 millonésimas de milímetro. Mientras más pequeño, más eficiente y rápido.</div>
+        </div>
+      </div>
+
+      <div class="sec-tag">// El ciclo de instrucción: Fetch → Decode → Execute</div>
+      <!-- SVG del ciclo -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 560 100" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;width:100%">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#06B6D4"/>
+            </marker>
+          </defs>
+          <!-- Boxes -->
+          <rect x="10" y="20" width="140" height="60" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="80" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#06B6D4">FETCH</text>
+          <text x="80" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8B949E">Buscar instrucción</text>
+
+          <rect x="210" y="20" width="140" height="60" rx="8" fill="#1e1b4b" stroke="#818CF8" stroke-width="1.5"/>
+          <text x="280" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#818CF8">DECODE</text>
+          <text x="280" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8B949E">Decodificar</text>
+
+          <rect x="410" y="20" width="140" height="60" rx="8" fill="#1a4731" stroke="#4ADE80" stroke-width="1.5"/>
+          <text x="480" y="47" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#4ADE80">EXECUTE</text>
+          <text x="480" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8B949E">Ejecutar</text>
+
+          <!-- Arrows -->
+          <line x1="152" y1="50" x2="208" y2="50" stroke="#06B6D4" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="352" y1="50" x2="408" y2="50" stroke="#06B6D4" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- Loop back -->
+          <path d="M480,80 Q480,95 280,95 Q80,95 80,80" stroke="#30363D" stroke-width="1" fill="none" stroke-dasharray="4,3"/>
+          <text x="280" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#30363D">siguiente instrucción</text>
+        </svg>
+      </div>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Fetch:</strong> la CPU busca la instrucción en memoria RAM. <strong>Decode:</strong> la Unidad de Control descifra qué operación realizar. <strong>Execute:</strong> la ALU o el hardware especializado ejecuta la operación. Este ciclo se repite miles de millones de veces por segundo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 4 — PARTES DEL PROCESADOR
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s4">
+    <div class="section-header" onclick="toggle(4)">
+      <div class="sh-num">04</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 4</div>
+        <div class="sh-title">Partes del Procesador</div>
+        <div class="sh-tags">
+          <span class="sh-tag">CU</span><span class="sh-tag">ALU</span>
+          <span class="sh-tag">Registros</span><span class="sh-tag">Caché</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <!-- CPU Internal SVG -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;width:100%">
+          <!-- CPU border -->
+          <rect x="10" y="10" width="480" height="240" rx="12" fill="#0D1117" stroke="#06B6D4" stroke-width="2"/>
+          <text x="250" y="32" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#06B6D4">CPU — UNIDAD CENTRAL DE PROCESO</text>
+
+          <!-- CU -->
+          <rect x="30" y="50" width="180" height="80" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="120" y="80" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#06B6D4">Unidad de Control</text>
+          <text x="120" y="97" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8B949E">(CU)</text>
+          <text x="120" y="116" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#6A737D">Fetch · Decode · Dirección</text>
+
+          <!-- ALU -->
+          <rect x="290" y="50" width="180" height="80" rx="8" fill="#1e1b4b" stroke="#818CF8" stroke-width="1.5"/>
+          <text x="380" y="80" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#818CF8">Unidad Aritmético</text>
+          <text x="380" y="97" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#818CF8">Lógica (ALU)</text>
+          <text x="380" y="116" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#6A737D">+  −  ×  ÷  AND  OR  NOT</text>
+
+          <!-- Arrow CU → ALU -->
+          <line x1="212" y1="90" x2="288" y2="90" stroke="#30363D" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+          <!-- Registers -->
+          <rect x="30" y="155" width="420" height="60" rx="8" fill="#2d2208" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="240" y="179" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#F59E0B">Registros</text>
+          <text x="240" y="197" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">PC (Program Counter) · IR (Instruction Register) · AC (Acumulador) · MAR · MDR</text>
+          <text x="240" y="210" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#6A737D">Memoria interna ultrarrápida dentro del procesador</text>
+
+          <!-- Arrows to registers -->
+          <line x1="120" y1="132" x2="120" y2="153" stroke="#30363D" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="380" y1="132" x2="380" y2="153" stroke="#30363D" stroke-width="1.5" marker-end="url(#arr)"/>
+        </svg>
+      </div>
+
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="cc-icon">🎛️</div>
+          <div class="cc-name">Unidad de Control (CU)</div>
+          <div class="cc-desc">Dirige el tráfico dentro del procesador. Busca instrucciones en memoria, las decodifica y le dice a la ALU qué operación realizar y con qué datos.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">🧮</div>
+          <div class="cc-name">Unidad Aritmético-Lógica (ALU)</div>
+          <div class="cc-desc">Ejecuta todas las operaciones matemáticas (suma, resta, multiplicación, división) y lógicas (AND, OR, NOT, comparaciones). Es la "calculadora" del CPU.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">📌</div>
+          <div class="cc-name">Registros</div>
+          <div class="cc-desc">Memoria interna del procesador, ultrarrápida pero muy pequeña (bytes). Guardan temporalmente los datos que la CPU está usando en este preciso instante.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">⚡</div>
+          <div class="cc-name">Memoria Caché</div>
+          <div class="cc-desc">Memoria rápida entre la CPU y la RAM. Guarda copias de los datos más usados para no tener que ir siempre a la RAM más lenta. Hay niveles: L1, L2, L3.</div>
+        </div>
+      </div>
+
+      <div class="warn-fact">
+        <div style="font-size:16px;flex-shrink:0">⚠️</div>
+        <div class="wf-text"><strong>Registros clave:</strong> el <strong>PC (Program Counter)</strong> apunta siempre a la próxima instrucción a ejecutar. El <strong>IR (Instruction Register)</strong> guarda la instrucción actual. El <strong>Acumulador</strong> almacena el resultado de la ALU.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 5 — BUSES DEL SISTEMA
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s5">
+    <div class="section-header" onclick="toggle(5)">
+      <div class="sh-num">05</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 5</div>
+        <div class="sh-title">Buses del Sistema</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Bus de datos</span>
+          <span class="sh-tag">Bus de direcciones</span>
+          <span class="sh-tag">Bus de control</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">Los <strong>buses</strong> son las "autopistas" de la computadora — canales por donde viajan los datos entre la CPU, la memoria y los periféricos. Sin buses, los componentes no pueden comunicarse.</p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="max-width:560px;width:100%">
+          <!-- CPU box -->
+          <rect x="10" y="70" width="110" height="60" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="65" y="96" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#06B6D4">CPU</text>
+          <text x="65" y="115" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Procesador</text>
+
+          <!-- RAM box -->
+          <rect x="225" y="70" width="110" height="60" rx="8" fill="#1e1b4b" stroke="#818CF8" stroke-width="1.5"/>
+          <text x="280" y="96" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#818CF8">RAM</text>
+          <text x="280" y="115" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Memoria</text>
+
+          <!-- I/O box -->
+          <rect x="440" y="70" width="110" height="60" rx="8" fill="#1a4731" stroke="#4ADE80" stroke-width="1.5"/>
+          <text x="495" y="96" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#4ADE80">E/S</text>
+          <text x="495" y="115" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Periféricos</text>
+
+          <!-- BUS DE DATOS (top) -->
+          <line x1="120" y1="80" x2="225" y2="80" stroke="#06B6D4" stroke-width="3"/>
+          <line x1="335" y1="80" x2="440" y2="80" stroke="#06B6D4" stroke-width="3"/>
+          <text x="280" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#06B6D4">Bus de DATOS</text>
+          <text x="280" y="60" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Transporta los datos binarios</text>
+
+          <!-- BUS DE DIRECCIONES (mid) -->
+          <line x1="120" y1="100" x2="225" y2="100" stroke="#818CF8" stroke-width="3"/>
+          <line x1="335" y1="100" x2="440" y2="100" stroke="#818CF8" stroke-width="3"/>
+          <text x="280" y="115" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#818CF8">Bus de DIRECCIONES</text>
+
+          <!-- BUS DE CONTROL (bottom) -->
+          <line x1="120" y1="120" x2="225" y2="120" stroke="#4ADE80" stroke-width="3"/>
+          <line x1="335" y1="120" x2="440" y2="120" stroke="#4ADE80" stroke-width="3"/>
+          <text x="280" y="140" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4ADE80">Bus de CONTROL</text>
+          <text x="280" y="153" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">Señales READ / WRITE / RESET</text>
+        </svg>
+      </div>
+
+      <table class="compare-table">
+        <tr><th>Bus</th><th>Función</th><th>Dirección</th><th>Ejemplo</th></tr>
+        <tr>
+          <td class="td-hl">Datos</td>
+          <td>Transporta los datos reales (bits) entre componentes</td>
+          <td>Bidireccional</td>
+          <td>El contenido de una variable</td>
+        </tr>
+        <tr>
+          <td class="td-in">Direcciones</td>
+          <td>Indica dónde en memoria leer o escribir</td>
+          <td>Unidireccional (CPU → Memoria)</td>
+          <td>La dirección 0x0042 en RAM</td>
+        </tr>
+        <tr>
+          <td style="color:var(--green);font-family:'JetBrains Mono';font-weight:600">Control</td>
+          <td>Envía señales de comando (leer, escribir, reset)</td>
+          <td>Bidireccional</td>
+          <td>Señal READ o WRITE</td>
+        </tr>
+      </table>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Ancho del bus:</strong> un bus de 32 bits puede transportar 32 bits a la vez; uno de 64 bits, el doble. Por eso los sistemas operativos de 64 bits son más eficientes que los de 32 bits — el "ancho de la autopista" es el doble.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 6 — MEMORIA
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s6">
+    <div class="section-header" onclick="toggle(6)">
+      <div class="sh-num">06</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 6</div>
+        <div class="sh-title">Memoria</div>
+        <div class="sh-tags">
+          <span class="sh-tag">RAM</span><span class="sh-tag">ROM</span>
+          <span class="sh-tag">Jerarquía</span><span class="sh-tag">Caché</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <table class="compare-table" style="margin-bottom:20px">
+        <tr><th>Característica</th><th>RAM</th><th>ROM</th></tr>
+        <tr><td>Significado</td><td>Random Access Memory</td><td>Read Only Memory</td></tr>
+        <tr><td>Contenido</td><td>Datos e instrucciones en uso activo</td><td>Firmware, BIOS, instrucciones de arranque</td></tr>
+        <tr><td>Volatilidad</td><td class="td-hl">Volátil — se borra al apagar</td><td class="td-in">No volátil — persiste siempre</td></tr>
+        <tr><td>Modificable</td><td>Lectura y escritura libre</td><td>Solo lectura (normalmente)</td></tr>
+        <tr><td>Velocidad</td><td>Rápida (ns)</td><td>Más lenta</td></tr>
+        <tr><td>Uso típico</td><td>Abrir programas, navegar</td><td>Arranque del sistema</td></tr>
+      </table>
+
+      <div class="sec-tag">// Jerarquía de memoria — de más rápida a más lenta</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:16px 0">
+        <div style="font-family:'JetBrains Mono';font-size:10px;color:var(--muted);align-self:flex-end;margin-bottom:2px">← Más rápida · Más cara · Menor capacidad</div>
+        <div class="mem-pyramid">
+          <div class="mem-layer ml-1">Registros (bytes)</div>
+          <div class="mem-layer ml-2">Caché L1/L2/L3 (KB–MB)</div>
+          <div class="mem-layer ml-3">RAM (GB)</div>
+          <div class="mem-layer ml-4">SSD / HDD (TB)</div>
+          <div class="mem-layer ml-5">Almacenamiento en la nube (∞)</div>
+        </div>
+        <div style="font-family:'JetBrains Mono';font-size:10px;color:var(--muted);align-self:flex-end;margin-top:2px">← Más lenta · Más barata · Mayor capacidad</div>
+      </div>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Principio de localidad:</strong> la caché funciona porque los programas tienden a acceder a los mismos datos repetidamente. Si un dato está en caché L1 (1-4 ciclos), es ~100 veces más rápido que buscarlo en RAM (~100 ciclos) y ~10,000 veces más que ir al disco.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 7 — VON NEUMANN
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s7">
+    <div class="section-header" onclick="toggle(7)">
+      <div class="sh-num">07</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 7</div>
+        <div class="sh-title">Arquitectura Von Neumann</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Memoria única</span>
+          <span class="sh-tag">John von Neumann</span>
+          <span class="sh-tag">1945</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">Propuesta por John von Neumann en 1945, esta arquitectura define que los <strong>datos y las instrucciones comparten la misma memoria</strong> y el mismo bus. Es el modelo sobre el que se construyeron casi todas las computadoras de propósito general que existen hoy.</p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;width:100%">
+          <defs>
+            <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#8B949E"/>
+            </marker>
+          </defs>
+          <!-- CPU -->
+          <rect x="20" y="50" width="140" height="80" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="90" y="83" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#06B6D4">CPU</text>
+          <text x="90" y="99" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">CU + ALU + Registros</text>
+          <text x="90" y="118" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#6A737D">Unidad de control y cálculo</text>
+
+          <!-- Memoria única -->
+          <rect x="240" y="30" width="140" height="120" rx="8" fill="#1C2129" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="310" y="62" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#F59E0B">MEMORIA</text>
+          <text x="310" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">ÚNICA</text>
+          <rect x="258" y="90" width="104" height="22" rx="4" fill="#2d2208" stroke="#F59E0B" stroke-width="1"/>
+          <text x="310" y="105" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#F59E0B">Instrucciones</text>
+          <rect x="258" y="118" width="104" height="22" rx="4" fill="#062830" stroke="#06B6D4" stroke-width="1"/>
+          <text x="310" y="133" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#06B6D4">Datos</text>
+
+          <!-- Bus único -->
+          <rect x="162" y="85" width="76" height="12" rx="2" fill="#30363D"/>
+          <text x="200" y="97" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">BUS ÚNICO</text>
+
+          <!-- E/S -->
+          <rect x="440" y="70" width="65" height="40" rx="6" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+          <text x="472" y="87" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#4ADE80">E/S</text>
+          <text x="472" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Periféricos</text>
+          <line x1="382" y1="90" x2="438" y2="90" stroke="#8B949E" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+          <!-- Bottleneck label -->
+          <text x="200" y="165" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#FF7B72">⚠ Cuello de botella de Von Neumann</text>
+          <text x="200" y="177" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">Un solo bus para datos e instrucciones → limitación de velocidad</text>
+        </svg>
+      </div>
+
+      <div class="warn-fact">
+        <div style="font-size:16px;flex-shrink:0">⚠️</div>
+        <div class="wf-text"><strong>El cuello de botella de Von Neumann:</strong> como datos e instrucciones comparten el mismo bus, la CPU debe esperar a que uno termine para acceder al otro. Esta limitación se llama "Von Neumann bottleneck" y fue el principal problema que motivó la arquitectura Harvard.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 8 — HARVARD
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s8">
+    <div class="section-header" onclick="toggle(8)">
+      <div class="sh-num">08</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 8</div>
+        <div class="sh-title">Arquitectura Harvard</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Memorias separadas</span>
+          <span class="sh-tag">Buses paralelos</span>
+          <span class="sh-tag">Microcontroladores</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">La arquitectura Harvard separa físicamente la <strong>memoria de instrucciones</strong> y la <strong>memoria de datos</strong>, cada una con su propio bus. Esto permite acceder a ambas al mismo tiempo, eliminando el cuello de botella de Von Neumann.</p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;width:100%">
+          <!-- CPU -->
+          <rect x="180" y="70" width="140" height="60" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="250" y="97" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#06B6D4">CPU</text>
+          <text x="250" y="116" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">CU + ALU + Registros</text>
+
+          <!-- Mem instrucciones (arriba) -->
+          <rect x="20" y="10" width="130" height="60" rx="8" fill="#2d2208" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="85" y="37" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#F59E0B">Memoria de</text>
+          <text x="85" y="53" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#F59E0B">Instrucciones</text>
+          <text x="85" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">Bus propio →</text>
+
+          <!-- Mem datos (abajo) -->
+          <rect x="20" y="130" width="130" height="60" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="85" y="157" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#06B6D4">Memoria de</text>
+          <text x="85" y="173" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#06B6D4">Datos</text>
+          <text x="85" y="185" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">Bus propio →</text>
+
+          <!-- Bus instrucciones -->
+          <line x1="152" y1="40" x2="178" y2="80" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="162" y="57" font-family="JetBrains Mono" font-size="8" fill="#F59E0B">Bus inst.</text>
+
+          <!-- Bus datos -->
+          <line x1="152" y1="160" x2="178" y2="120" stroke="#06B6D4" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="155" y="148" font-family="JetBrains Mono" font-size="8" fill="#06B6D4">Bus datos</text>
+
+          <!-- Label paralelo -->
+          <text x="250" y="170" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4ADE80">✓ Acceso simultáneo a instrucciones y datos</text>
+
+          <!-- E/S -->
+          <rect x="360" y="70" width="80" height="60" rx="6" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+          <text x="400" y="97" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#4ADE80">E/S</text>
+          <text x="400" y="115" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Periféricos</text>
+          <line x1="322" y1="100" x2="358" y2="100" stroke="#4ADE80" stroke-width="1.5" marker-end="url(#arr)"/>
+        </svg>
+      </div>
+
+      <table class="compare-table">
+        <tr><th>Característica</th><th>Von Neumann</th><th>Harvard</th></tr>
+        <tr><td>Memoria</td><td>Una sola (datos + instrucciones)</td><td class="td-hl">Separada (dos memorias)</td></tr>
+        <tr><td>Buses</td><td>Un bus compartido</td><td class="td-hl">Buses independientes</td></tr>
+        <tr><td>Velocidad</td><td>Cuello de botella</td><td class="td-hl">Acceso paralelo — más rápido</td></tr>
+        <tr><td>Complejidad</td><td class="td-in">Simple — fácil de implementar</td><td>Más compleja</td></tr>
+        <tr><td>Uso típico</td><td>PCs, servidores, laptops</td><td class="td-hl">Microcontroladores (PIC, AVR, ARM)</td></tr>
+      </table>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Harvard modificada:</strong> los procesadores modernos (Intel, AMD) usan una variante llamada <strong>Harvard modificada</strong> — internamente separan las cachés de instrucciones y datos (L1-I y L1-D), pero externamente comparten la memoria RAM. Obtienen lo mejor de ambos mundos.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 9 — MICROCONTROLADORES
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s9">
+    <div class="section-header" onclick="toggle(9)">
+      <div class="sh-num">09</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 9</div>
+        <div class="sh-title">Arquitectura de Microcontroladores</div>
+        <div class="sh-tags">
+          <span class="sh-tag">MCU</span><span class="sh-tag">Todo en uno</span>
+          <span class="sh-tag">vs Microprocesador</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">Un <strong>microcontrolador (MCU)</strong> es un sistema computacional completo en un solo chip: incluye CPU, memoria RAM, memoria Flash (para el programa), y puertos de entrada/salida integrados. Es la diferencia entre una caja de herramientas completa vs. solo un martillo.</p>
+
+      <table class="compare-table">
+        <tr><th>Característica</th><th>Microprocesador (CPU)</th><th>Microcontrolador (MCU)</th></tr>
+        <tr><td>Componentes</td><td>Solo la CPU — necesita chips externos</td><td class="td-hl">CPU + RAM + Flash + I/O en un chip</td></tr>
+        <tr><td>Tamaño</td><td>Más grande (requiere placa madre)</td><td class="td-hl">Muy compacto — chip único</td></tr>
+        <tr><td>Potencia</td><td>Alta capacidad de procesamiento</td><td>Limitado pero suficiente para su tarea</td></tr>
+        <tr><td>Consumo</td><td>Alto (vatios)</td><td class="td-hl">Muy bajo (milivatios)</td></tr>
+        <tr><td>Costo</td><td>Alto + periféricos</td><td class="td-hl">Muy bajo ($1–$10)</td></tr>
+        <tr><td>Aplicaciones</td><td>PC, servidor, laptop</td><td class="td-hl">Arduino, electrodomésticos, IoT</td></tr>
+      </table>
+
+      <div class="warn-fact">
+        <div style="font-size:16px;flex-shrink:0">🎯</div>
+        <div class="wf-text"><strong>Regla práctica:</strong> si necesitas procesar video, abrir múltiples aplicaciones o acceder a internet complejo → <strong>microprocesador</strong>. Si necesitas controlar un motor, leer un sensor o parpadear un LED de manera confiable y eficiente → <strong>microcontrolador</strong>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 10 — ARQUITECTURA INTERNA MCU
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s10">
+    <div class="section-header" onclick="toggle(10)">
+      <div class="sh-num">10</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 10</div>
+        <div class="sh-title">Arquitectura interna de un microcontrolador</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Arduino</span><span class="sh-tag">PIC</span>
+          <span class="sh-tag">ESP32</span><span class="sh-tag">Periféricos integrados</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">Dentro de un microcontrolador, todos los componentes conviven en un solo chip de silicio. Usan típicamente <strong>arquitectura Harvard</strong> para maximizar la velocidad con un bajo consumo energético.</p>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 520 240" xmlns="http://www.w3.org/2000/svg" style="max-width:520px;width:100%">
+          <!-- Chip border -->
+          <rect x="10" y="10" width="500" height="220" rx="12" fill="#0D1117" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6,3"/>
+          <text x="260" y="30" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#06B6D4">MICROCONTROLADOR — chip único</text>
+
+          <!-- CPU -->
+          <rect x="185" y="45" width="110" height="55" rx="6" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="240" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#06B6D4">CPU</text>
+          <text x="240" y="87" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">CU + ALU + Registros</text>
+
+          <!-- Flash -->
+          <rect x="30" y="45" width="110" height="55" rx="6" fill="#2d2208" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="85" y="67" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#F59E0B">Flash</text>
+          <text x="85" y="82" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Programa (No volátil)</text>
+          <text x="85" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">32KB — 4MB</text>
+          <line x1="142" y1="72" x2="183" y2="72" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#arr)"/>
+
+          <!-- RAM -->
+          <rect x="340" y="45" width="110" height="55" rx="6" fill="#1e1b4b" stroke="#818CF8" stroke-width="1.5"/>
+          <text x="395" y="67" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#818CF8">SRAM</text>
+          <text x="395" y="82" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Datos temporales</text>
+          <text x="395" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">2KB — 512KB</text>
+          <line x1="297" y1="72" x2="338" y2="72" stroke="#818CF8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+          <!-- Peripherals row -->
+          <rect x="30" y="140" width="90" height="45" rx="5" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+          <text x="75" y="160" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#4ADE80">GPIO</text>
+          <text x="75" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Pines I/O</text>
+
+          <rect x="135" y="140" width="90" height="45" rx="5" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+          <text x="180" y="160" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#4ADE80">ADC/DAC</text>
+          <text x="180" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Analógico/Digital</text>
+
+          <rect x="240" y="140" width="90" height="45" rx="5" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+          <text x="285" y="160" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#4ADE80">Timers</text>
+          <text x="285" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Temporizadores</text>
+
+          <rect x="345" y="140" width="130" height="45" rx="5" fill="#1a4731" stroke="#4ADE80" stroke-width="1"/>
+          <text x="410" y="160" text-anchor="middle" font-family="JetBrains Mono" font-size="9" font-weight="700" fill="#4ADE80">UART/SPI/I²C</text>
+          <text x="410" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Comunicación</text>
+
+          <!-- Bus interno -->
+          <rect x="30" y="108" width="460" height="10" rx="2" fill="#30363D"/>
+          <text x="260" y="121" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#8B949E">Bus interno del sistema</text>
+
+          <!-- Label periféricos -->
+          <text x="260" y="205" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#6A737D">Periféricos integrados</text>
+        </svg>
+      </div>
+
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="cc-icon">🟢</div>
+          <div class="cc-name">Arduino (AVR / ARM)</div>
+          <div class="cc-desc">Basado en ATmega328 (AVR) o ARM Cortex. 32KB Flash, 2KB RAM. Ideal para aprender electrónica y automatización.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">🔴</div>
+          <div class="cc-name">PIC (Microchip)</div>
+          <div class="cc-desc">Familia de microcontroladores muy populares en industria. Arquitectura RISC propia, muy robustos y con bajo consumo.</div>
+        </div>
+        <div class="comp-card">
+          <div class="cc-icon">🔵</div>
+          <div class="cc-name">ESP32 (Espressif)</div>
+          <div class="cc-desc">Dual-core ARM Cortex-M0, WiFi y Bluetooth integrados. El favorito para proyectos IoT por su conectividad y bajo costo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 11 — RISC Y CISC
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s11">
+    <div class="section-header" onclick="toggle(11)">
+      <div class="sh-num">11</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 11</div>
+        <div class="sh-title">Arquitecturas RISC y CISC</div>
+        <div class="sh-tags">
+          <span class="sh-tag">ARM</span><span class="sh-tag">x86</span>
+          <span class="sh-tag">Instrucciones reducidas vs complejas</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">Dos filosofías radicalmente distintas para diseñar el juego de instrucciones de un procesador. La pregunta central: ¿es mejor tener <em>pocas instrucciones simples</em> que se ejecutan rápido, o <em>muchas instrucciones complejas</em> que hacen más con menos código?</p>
+
+      <div class="arch-pills">
+        <div class="arch-pill">
+          <div class="ap-label risc">RISC — Reduced Instruction Set Computer</div>
+          <ul class="ap-items">
+            <li class="risc-li">Pocas instrucciones, todas simples y de tamaño fijo</li>
+            <li class="risc-li">Cada instrucción se ejecuta en 1 ciclo de reloj</li>
+            <li class="risc-li">Diseño del hardware más simple y económico</li>
+            <li class="risc-li">Bajo consumo energético — ideal para móviles</li>
+            <li class="risc-li">Ejemplos: <strong>ARM</strong> (iPhone, Android), MIPS, RISC-V</li>
+          </ul>
+        </div>
+        <div class="arch-pill">
+          <div class="ap-label cisc">CISC — Complex Instruction Set Computer</div>
+          <ul class="ap-items">
+            <li class="cisc-li">Muchas instrucciones, algunas muy complejas</li>
+            <li class="cisc-li">Una instrucción puede realizar múltiples operaciones</li>
+            <li class="cisc-li">Menos líneas de código ensamblador necesarias</li>
+            <li class="cisc-li">Mayor consumo pero muy potente</li>
+            <li class="cisc-li">Ejemplos: <strong>x86/x64</strong> (Intel, AMD — todas las PCs)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Hoy se usan los dos:</strong> los procesadores Intel/AMD (CISC x86) internamente dividen sus instrucciones complejas en micro-operaciones simples (como RISC). Y los procesadores ARM (RISC) de los nuevos Mac M1/M2/M3 son más rápidos que muchos x86 en eficiencia energética.</div>
+      </div>
+
+      <table class="compare-table" style="margin-top:16px">
+        <tr><th>Aspecto</th><th>RISC</th><th>CISC</th></tr>
+        <tr><td>Instrucciones</td><td class="td-hl">~50–200 instrucciones</td><td>300–1000+ instrucciones</td></tr>
+        <tr><td>Tamaño instrucción</td><td class="td-hl">Fijo (32 bits)</td><td>Variable (1–15 bytes en x86)</td></tr>
+        <tr><td>Ciclos por instrucción</td><td class="td-hl">1 ciclo (pipeline eficiente)</td><td>1–20+ ciclos</td></tr>
+        <tr><td>Registros</td><td class="td-hl">Muchos registros generales</td><td>Pocos registros especializados</td></tr>
+        <tr><td>Uso dominante</td><td class="td-hl">Móviles, IoT, Mac M-series</td><td>PCs, servidores, laptops</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TEMA 12 — ISA / JUEGO DE INSTRUCCIONES
+       ══════════════════════════════════════════ -->
+  <div class="section-block" id="s12">
+    <div class="section-header" onclick="toggle(12)">
+      <div class="sh-num">12</div>
+      <div class="sh-info">
+        <div class="sh-label">// Módulo 12</div>
+        <div class="sh-title">Juego de Instrucciones (ISA)</div>
+        <div class="sh-tags">
+          <span class="sh-tag">Instruction Set Architecture</span>
+          <span class="sh-tag">LOAD STORE ADD</span>
+          <span class="sh-tag">Lenguaje ensamblador</span>
+        </div>
+      </div>
+      <div class="sh-toggle">▼</div>
+    </div>
+    <div class="section-body">
+      <p class="concept-lead">El <strong>ISA (Instruction Set Architecture)</strong> es el contrato entre el hardware y el software: define exactamente qué operaciones puede ejecutar un procesador, cómo se codifican en binario, y cómo accede a los datos. Es la "interfaz" que ven los compiladores y el sistema operativo.</p>
+
+      <div class="sec-tag">// Tipos básicos de instrucciones</div>
+      <table class="isa-table">
+        <tr>
+          <th>Tipo</th><th>Instrucción</th><th>Acción</th><th>Analogía en Python</th>
+        </tr>
+        <tr>
+          <td>Transferencia</td>
+          <td><span class="isa-cmd">LOAD R1, [addr]</span></td>
+          <td>Copia dato de memoria al registro R1</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">x = lista[addr]</code></td>
+        </tr>
+        <tr>
+          <td>Transferencia</td>
+          <td><span class="isa-cmd">STORE [addr], R1</span></td>
+          <td>Guarda R1 en memoria</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">lista[addr] = x</code></td>
+        </tr>
+        <tr>
+          <td>Aritmética</td>
+          <td><span class="isa-cmd">ADD R1, R2, R3</span></td>
+          <td>R1 = R2 + R3</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">a = b + c</code></td>
+        </tr>
+        <tr>
+          <td>Aritmética</td>
+          <td><span class="isa-cmd">SUB R1, R2, R3</span></td>
+          <td>R1 = R2 − R3</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">a = b - c</code></td>
+        </tr>
+        <tr>
+          <td>Lógica</td>
+          <td><span class="isa-cmd">AND R1, R2, R3</span></td>
+          <td>R1 = R2 AND R3 (bit a bit)</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">a = b & c</code></td>
+        </tr>
+        <tr>
+          <td>Control</td>
+          <td><span class="isa-cmd">CMP R1, R2</span></td>
+          <td>Compara R1 y R2, actualiza flags</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">if a == b:</code></td>
+        </tr>
+        <tr>
+          <td>Control</td>
+          <td><span class="isa-cmd">JMP [addr]</span></td>
+          <td>Salta a otra instrucción (goto)</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">continuar / break</code></td>
+        </tr>
+        <tr>
+          <td>Control</td>
+          <td><span class="isa-cmd">CALL [func]</span></td>
+          <td>Llama a una subrutina (función)</td>
+          <td><code style="font-family:'JetBrains Mono';font-size:12px;color:#79C0FF">funcion()</code></td>
+        </tr>
+      </table>
+
+      <div class="key-fact">
+        <div class="kf-icon">💡</div>
+        <div class="kf-text"><strong>Cuando escribes Python:</strong> el intérprete de Python traduce tu código a <em>bytecode</em>, que a su vez el sistema operativo convierte en instrucciones ISA del procesador (x86, ARM, etc.). Tu <code style="color:#06B6D4">a = b + c</code> se convierte en varios <code style="color:#06B6D4">LOAD</code>, <code style="color:#06B6D4">ADD</code> y <code style="color:#06B6D4">STORE</code> a nivel de hardware.</div>
+      </div>
+
+      <div style="margin-top:24px;padding:20px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;text-align:center">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Descarga el resumen completo de los 12 temas en formato PDF para imprimir o compartir con los estudiantes.</p>
+        <button class="btn-dl" onclick="downloadResumen()">
+          ⬇ Descargar resumen — Semana 1 (.txt)
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  ITB — Instituto Tecnológico de Negocios &nbsp;·&nbsp; <span>Arquitectura de Computadoras</span> · Semana 1
+</footer>
+
+<script>
+// ── ESTADO ──────────────────────────────────────
+const TOTAL = 12;
+const visited = new Set();
+
+const TOPICS = [
+  "Intro General","Evolución","CPU","Partes CPU",
+  "Buses","Memoria","Von Neumann","Harvard",
+  "MCU Arquitectura","MCU Interna","RISC/CISC","ISA"
+];
+
+// ── NAV DOTS ──────────────────────────────────────
+function buildDots() {
+  const nav = document.getElementById('nav-dots');
+  TOPICS.forEach((t, i) => {
+    const d = document.createElement('div');
+    d.className = 'np-dot';
+    d.title = t;
+    d.id = `ndot-${i+1}`;
+    d.onclick = () => { document.getElementById(`s${i+1}`).scrollIntoView({behavior:'smooth',block:'start'}); };
+    nav.appendChild(d);
+  });
+}
+
+// ── PROGRESS BAR + CHIPS ──────────────────────────
+function buildProgressChips() {
+  const container = document.getElementById('ps-topics');
+  TOPICS.forEach((t, i) => {
+    const span = document.createElement('span');
+    span.className = 'ps-topic';
+    span.textContent = t;
+    span.id = `chip-${i+1}`;
+    span.onclick = () => {
+      markDone(i+1);
+      document.getElementById(`s${i+1}`).scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    container.appendChild(span);
+  });
+}
+
+function markDone(n) {
+  visited.add(n);
+  document.getElementById(`chip-${n}`)?.classList.add('done');
+  document.getElementById(`ndot-${n}`)?.classList.add('done');
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (visited.size / TOTAL) * 100;
+  document.getElementById('ps-fill').style.width = pct + '%';
+  document.getElementById('ps-count').textContent = `${visited.size} / ${TOTAL} temas`;
+}
+
+// ── ACCORDION ──────────────────────────────────────
+function toggle(n) {
+  const block = document.getElementById(`s${n}`);
+  const isActive = block.classList.contains('active');
+
+  // Close all
+  document.querySelectorAll('.section-block').forEach(b => b.classList.remove('active'));
+
+  if (!isActive) {
+    block.classList.add('active');
+    block.classList.add('visited');
+    markDone(n);
+  }
+}
+
+// ── RESUMEN TXT ──────────────────────────────────────
+function downloadResumen() {
+  const content = `ARQUITECTURA DE COMPUTADORAS — SEMANA 1
+ITB — Instituto Tecnológico de Negocios
+=============================================
+
+01. INTRODUCCIÓN GENERAL
+   • Arquitectura de computadoras: diseño y organización de componentes
+   • Hardware (físico) | Software (programas) | Firmware (bajo nivel en chip)
+   • Sistema computacional: Entrada → Procesamiento → Almacenamiento → Salida
+
+02. EVOLUCIÓN DE LAS COMPUTADORAS
+   • 1ª Gen (1940-56): Tubos de vacío — ENIAC
+   • 2ª Gen (1956-63): Transistores
+   • 3ª Gen (1964-71): Circuitos integrados
+   • 4ª Gen (1971-2010): Microprocesadores — Ley de Moore
+   • 5ª Gen (2010-hoy): IA, computación cuántica, IoT
+
+03. EL PROCESADOR (CPU)
+   • Cerebro del sistema computacional
+   • Ciclo: FETCH (buscar) → DECODE (decodificar) → EXECUTE (ejecutar)
+   • Velocidad en GHz, núcleos (cores), tamaño del proceso en nm
+
+04. PARTES DEL PROCESADOR
+   • Unidad de Control (CU): dirige el tráfico — Fetch, Decode
+   • Unidad Aritmético-Lógica (ALU): ejecuta +  −  ×  ÷  AND  OR  NOT
+   • Registros: memoria interna ultrarrápida (PC, IR, Acumulador, MAR, MDR)
+   • Caché (L1/L2/L3): memoria rápida entre CPU y RAM
+
+05. BUSES DEL SISTEMA
+   • Bus de DATOS: transporta los datos (bidireccional)
+   • Bus de DIRECCIONES: indica dónde leer/escribir (CPU → Memoria)
+   • Bus de CONTROL: señales READ/WRITE/RESET
+   • Ancho del bus: 32 bits vs 64 bits — "ancho de la autopista"
+
+06. MEMORIA
+   • RAM (volátil): datos en uso activo — se borra al apagar
+   • ROM (no volátil): firmware, BIOS — persiste siempre
+   • Jerarquía: Registros → Caché → RAM → SSD/HDD → Nube
+   • Principio de localidad: la caché guarda lo más usado
+
+07. ARQUITECTURA VON NEUMANN (1945)
+   • Memoria ÚNICA para datos e instrucciones
+   • Un solo bus compartido
+   • Cuello de botella: CPU espera para acceder a datos o instrucciones
+   • Uso: PCs, laptops, servidores
+
+08. ARQUITECTURA HARVARD
+   • Memorias SEPARADAS: una para instrucciones, otra para datos
+   • Buses independientes → acceso paralelo y simultáneo
+   • Más rápida, sin cuello de botella
+   • Uso: microcontroladores (PIC, AVR, ARM)
+   • Harvard modificada: procesadores modernos Intel/AMD internamente
+
+09. MICROCONTROLADORES (MCU)
+   • Sistema completo en un chip: CPU + RAM + Flash + I/O
+   • vs Microprocesador: solo CPU — necesita chips externos
+   • Bajo consumo, bajo costo ($1-$10), compactos
+   • Uso: Arduino, electrodomésticos, IoT, sensores
+
+10. ARQUITECTURA INTERNA DE UN MCU
+   • CPU + Flash (programa no volátil) + SRAM (datos) + Periféricos
+   • Periféricos integrados: GPIO, ADC/DAC, Timers, UART/SPI/I²C
+   • Ejemplos: Arduino (ATmega/ARM), PIC (Microchip), ESP32 (WiFi+BT)
+
+11. RISC VS CISC
+   • RISC (Reduced): pocas instrucciones simples, 1 ciclo, bajo consumo
+     → ARM (iPhone, Android, Mac M1/M2/M3)
+   • CISC (Complex): muchas instrucciones complejas, más potente
+     → x86/x64 (Intel, AMD — todas las PCs)
+
+12. JUEGO DE INSTRUCCIONES (ISA)
+   • ISA: contrato entre hardware y software — qué puede hacer el procesador
+   • Instrucciones básicas:
+     LOAD  → leer de memoria al registro   (x = lista[addr])
+     STORE → guardar registro en memoria   (lista[addr] = x)
+     ADD   → suma dos registros            (a = b + c)
+     SUB   → resta dos registros           (a = b - c)
+     CMP   → compara registros (actualiza flags)
+     JMP   → salto incondicional (goto)
+     CALL  → llamada a subrutina (función)
+   • Python → bytecode → instrucciones ISA del procesador
+
+=============================================
+Clase elaborada con https://dbetancourta.github.io/EDD/
+`;
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'arq-computadoras-semana1-resumen.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── INIT ──────────────────────────────────────
+buildDots();
+buildProgressChips();
+</script>
+</body>
+</html>
