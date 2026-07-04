@@ -169,6 +169,211 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);
   .about-inner{grid-template-columns:1fr}
   footer{flex-direction:column;align-items:center;text-align:center}
 }
+
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.78);
+  backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;
+  padding:64px 1rem 2rem;opacity:0;pointer-events:none;transition:opacity .25s;overflow-y:auto}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  width:100%;max-width:760px;overflow:hidden;transform:translateY(24px);
+  transition:transform .3s;margin-bottom:2rem}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-head{background:var(--surface2);border-bottom:1px solid var(--border);
+  padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.modal-head-left{display:flex;align-items:center;gap:14px}
+.modal-icon{width:42px;height:42px;border-radius:9px;background:rgba(255,123,114,.1);
+  border:1px solid rgba(255,123,114,.25);display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex-shrink:0}
+.modal-head-title{font-size:17px;font-weight:700;margin-bottom:2px}
+.modal-head-sub{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.modal-close{width:34px;height:34px;border-radius:7px;background:none;
+  border:1px solid var(--border);color:var(--muted);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.modal-close:hover{color:var(--text);border-color:var(--muted)}
+.modal-body{padding:28px;display:flex;flex-direction:column;gap:24px}
+.alert-banner{background:rgba(255,123,114,.07);border:1px solid rgba(255,123,114,.25);
+  border-radius:9px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+.ab-icon{font-size:18px;flex-shrink:0}
+.ab-text{font-size:14px;color:var(--muted);line-height:1.6}
+.ab-text strong{color:#FF7B72}
+.m-section-title{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.m-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.delivery-steps{display:flex;flex-direction:column;gap:0}
+.d-step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.d-step:last-child{border-bottom:none}
+.d-step-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  color:#FF7B72;background:rgba(255,123,114,.1);border:1px solid rgba(255,123,114,.25);
+  min-width:32px;height:32px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px}
+.d-step-title{font-size:15px;font-weight:600;margin-bottom:5px}
+.d-step-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.d-step-desc strong{color:var(--text)}
+.d-step-desc em{color:#FF7B72;font-style:normal}
+.format-box{background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;overflow:hidden;margin-top:10px}
+.format-box-head{background:#010409;border-bottom:1px solid var(--border);
+  padding:8px 14px;display:flex;align-items:center;gap:8px}
+.fbh-dots{display:flex;gap:4px}
+.fbh-dots span{width:9px;height:9px;border-radius:50%}
+.fbd1{background:#FF5F56}.fbd2{background:#FFBD2E}.fbd3{background:#27C93F}
+.fbh-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin:0 auto}
+.format-row{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);gap:10px}
+.format-row:last-child{border-bottom:none}
+.fr-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  min-width:160px;flex-shrink:0}
+.fr-value{font-size:13px;color:var(--text)}
+.fv-hl{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 8px;
+  border-radius:4px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#6366F1}
+.cl-list{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.cl-row{display:flex;gap:10px;align-items:flex-start;background:var(--surface2);
+  border:1px solid var(--border);border-radius:7px;padding:9px 13px}
+.cl-check{color:#4ADE80;flex-shrink:0;margin-top:1px;font-size:13px}
+.cl-text{font-size:13px;color:var(--muted);line-height:1.5}
+.cl-text strong{color:var(--text)}
+
+
+.nav-entrega-btn{display:flex;align-items:center;gap:6px;background:rgba(255,123,114,.1);
+  border:1px solid rgba(255,123,114,.3);color:#FF7B72;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:600;padding:5px 14px;border-radius:6px;cursor:pointer;
+  transition:all .2s;white-space:nowrap}
+.nav-entrega-btn:hover{background:rgba(255,123,114,.2);border-color:#FF7B72}
+.nav-entrega-btn .pdot{width:6px;height:6px;border-radius:50%;background:#FF7B72;
+  animation:pulse-red 2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(255,123,114,.4)}50%{box-shadow:0 0 0 5px rgba(255,123,114,0)}}
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.78);
+  backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;
+  padding:64px 1rem 2rem;opacity:0;pointer-events:none;transition:opacity .25s;overflow-y:auto}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  width:100%;max-width:760px;overflow:hidden;transform:translateY(24px);
+  transition:transform .3s;margin-bottom:2rem}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-head{background:var(--surface2);border-bottom:1px solid var(--border);
+  padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.modal-head-left{display:flex;align-items:center;gap:14px}
+.modal-icon{width:42px;height:42px;border-radius:9px;background:rgba(255,123,114,.1);
+  border:1px solid rgba(255,123,114,.25);display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex-shrink:0}
+.modal-head-title{font-size:17px;font-weight:700;margin-bottom:2px}
+.modal-head-sub{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.modal-close{width:34px;height:34px;border-radius:7px;background:none;
+  border:1px solid var(--border);color:var(--muted);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.modal-close:hover{color:var(--text);border-color:var(--muted)}
+.modal-body{padding:28px;display:flex;flex-direction:column;gap:24px}
+.alert-banner{background:rgba(255,123,114,.07);border:1px solid rgba(255,123,114,.25);
+  border-radius:9px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+.ab-icon{font-size:18px;flex-shrink:0}
+.ab-text{font-size:14px;color:var(--muted);line-height:1.6}
+.ab-text strong{color:#FF7B72}
+.m-sec-title{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.m-sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.d-steps{display:flex;flex-direction:column}
+.d-step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.d-step:last-child{border-bottom:none}
+.d-step-n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  color:#FF7B72;background:rgba(255,123,114,.1);border:1px solid rgba(255,123,114,.25);
+  min-width:32px;height:32px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px}
+.d-title{font-size:15px;font-weight:600;margin-bottom:5px}
+.d-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.d-desc strong{color:var(--text)}
+.d-desc em{color:#FF7B72;font-style:normal}
+.fmt-box{background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;overflow:hidden;margin-top:10px}
+.fmt-head{background:#010409;border-bottom:1px solid var(--border);
+  padding:8px 14px;display:flex;align-items:center;gap:8px}
+.fmt-dots{display:flex;gap:4px}
+.fmt-dots span{width:9px;height:9px;border-radius:50%}
+.fd1{background:#FF5F56}.fd2{background:#FFBD2E}.fd3{background:#27C93F}
+.fmt-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin:0 auto}
+.fmt-row{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);gap:10px}
+.fmt-row:last-child{border-bottom:none}
+.fr-k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);min-width:150px;flex-shrink:0}
+.fr-v{font-size:13px;color:var(--text)}
+.fv{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 8px;
+  border-radius:4px;display:inline-block}
+.cl-list{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.cl-row{display:flex;gap:10px;align-items:flex-start;background:var(--surface2);
+  border:1px solid var(--border);border-radius:7px;padding:9px 13px}
+.cl-chk{color:#4ADE80;flex-shrink:0;font-size:14px;font-weight:700;margin-top:1px}
+.cl-txt{font-size:13px;color:var(--muted);line-height:1.5}
+.cl-txt strong{color:var(--text)}
+
+/* ── ENTREGA BUTTON + MODAL ── */
+.nav-entrega-btn{display:flex;align-items:center;gap:6px;background:rgba(255,123,114,.1);
+  border:1px solid rgba(255,123,114,.3);color:#FF7B72;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:600;padding:5px 14px;border-radius:6px;cursor:pointer;
+  transition:all .2s;white-space:nowrap}
+.nav-entrega-btn:hover{background:rgba(255,123,114,.2);border-color:#FF7B72}
+.nav-entrega-btn .pdot{width:6px;height:6px;border-radius:50%;background:#FF7B72;
+  animation:pulse-red 2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(255,123,114,.4)}50%{box-shadow:0 0 0 5px rgba(255,123,114,0)}}
+.mentrega{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);
+  backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;
+  padding:60px 1rem 2rem;overflow-y:auto}
+.mentrega.open{display:flex}
+.mentrega-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  width:100%;max-width:740px;overflow:hidden;margin-bottom:2rem}
+.me-head{background:var(--surface2);border-bottom:1px solid var(--border);
+  padding:20px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.me-head-left{display:flex;align-items:center;gap:12px}
+.me-icon{width:40px;height:40px;border-radius:9px;background:rgba(255,123,114,.1);
+  border:1px solid rgba(255,123,114,.25);display:flex;align-items:center;
+  justify-content:center;font-size:17px;flex-shrink:0}
+.me-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.me-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.me-close{width:32px;height:32px;border-radius:7px;background:none;
+  border:1px solid var(--border);color:var(--muted);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.me-close:hover{color:var(--text);border-color:var(--muted)}
+.me-body{padding:24px;display:flex;flex-direction:column;gap:20px}
+.me-alert{background:rgba(255,123,114,.07);border:1px solid rgba(255,123,114,.25);
+  border-radius:9px;padding:13px 16px;display:flex;gap:10px;align-items:flex-start;
+  font-size:13px;color:var(--muted);line-height:1.6}
+.me-alert strong{color:#FF7B72}
+.me-stitle{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px}
+.me-stitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.me-steps{display:flex;flex-direction:column}
+.me-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.me-step:last-child{border-bottom:none}
+.me-sn{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;
+  color:#FF7B72;background:rgba(255,123,114,.1);border:1px solid rgba(255,123,114,.2);
+  min-width:30px;height:30px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.me-stit{font-size:14px;font-weight:600;margin-bottom:4px}
+.me-sdesc{font-size:13px;color:var(--muted);line-height:1.6}
+.me-sdesc strong{color:var(--text)}
+.me-sdesc em{color:#FF7B72;font-style:normal}
+.me-fbox{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;margin-top:10px}
+.me-fhead{background:#010409;border-bottom:1px solid var(--border);
+  padding:7px 12px;display:flex;align-items:center;gap:7px}
+.me-fdots{display:flex;gap:4px}
+.me-fdots span{width:8px;height:8px;border-radius:50%}
+.mfd1{background:#FF5F56}.mfd2{background:#FFBD2E}.mfd3{background:#27C93F}
+.me-flbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin:0 auto}
+.me-frow{display:flex;align-items:center;padding:9px 14px;
+  border-bottom:1px solid var(--border);gap:10px}
+.me-frow:last-child{border-bottom:none}
+.me-fk{font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--muted);min-width:140px;flex-shrink:0}
+.me-fv{font-size:13px;color:var(--text)}
+.me-chip{font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:2px 8px;border-radius:4px;display:inline-block}
+.me-cl{display:flex;flex-direction:column;gap:6px}
+.me-cli{display:flex;gap:9px;align-items:flex-start;background:var(--surface2);
+  border:1px solid var(--border);border-radius:7px;padding:9px 12px}
+.me-clchk{color:#4ADE80;font-weight:700;font-size:13px;flex-shrink:0}
+.me-cltxt{font-size:13px;color:var(--muted);line-height:1.4}
+.me-cltxt strong{color:var(--text)}
 </style>
 </head>
 <body>
@@ -182,9 +387,114 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);
   </div>
   <div class="nav-right">
     <div class="nav-period">Período 2025 · 2026</div>
+    <button class="nav-entrega-btn" onclick="openModal()"><span class="pdot"></span>¿Cómo entregar?</button>
     <div class="nav-dot"></div>
   </div>
 </nav>
+<!-- MODAL ENTREGA -->
+<div class="mentrega" id="mentrega" onclick="if(event.target===this)closeModal()">
+  <div class="mentrega-box">
+    <div class="me-head">
+      <div class="me-head-left">
+        <div class="me-icon">📋</div>
+        <div>
+          <div class="me-title">¿Cómo entregar mis actividades?</div>
+          <div class="me-sub">// Guía de entrega en EVA · ARQ · Arquitectura de Computadoras</div>
+        </div>
+      </div>
+      <button class="me-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="me-body">
+
+      <div class="me-alert">
+        <span style="font-size:17px;flex-shrink:0">⚠️</span>
+        <div><strong>Formato obligatorio:</strong> Redacta tus respuestas y diagramas desarrollados en clase. El archivo final debe entregarse en <strong>PDF</strong>.</div>
+      </div>
+
+      <div>
+        <div class="me-stitle">// Pasos para la entrega</div>
+        <div class="me-steps">
+
+          <div class="me-step">
+            <div class="me-sn">1</div>
+            <div>
+              <div class="me-stit">Crea un documento Word o Google Docs</div>
+              <div class="me-sdesc">Nómbralo exactamente así:<br>
+                <em>Apellido_Nombre_Practica_N</em> &nbsp;→&nbsp; Ej: <em>Torres_Diego_Practica_1.docx</em>
+              </div>
+            </div>
+          </div>
+
+          <div class="me-step">
+            <div class="me-sn">2</div>
+            <div>
+              <div class="me-stit">Desarrolla el contenido solicitado</div>
+              <div class="me-sdesc">Escribe con tus propias palabras las respuestas a cada actividad. Incluye <strong>diagramas o esquemas</strong> donde se soliciten. Explica el <em>razonamiento</em> detrás de cada respuesta.</div>
+            </div>
+          </div>
+
+          <div class="me-step">
+            <div class="me-sn">3</div>
+            <div>
+              <div class="me-stit">Agrega capturas de pantalla</div>
+              <div class="me-sdesc">Inserta <strong>capturas claras</strong> que evidencien tu trabajo: pantalla del archivo abierto, resultados obtenidos y cualquier configuración relevante.</div>
+            </div>
+          </div>
+
+          <div class="me-step">
+            <div class="me-sn">4</div>
+            <div>
+              <div class="me-stit">Exporta el documento como PDF</div>
+              <div class="me-sdesc">
+                <strong>Word:</strong> Archivo → Guardar como → PDF.<br>
+                <strong>Google Docs:</strong> Archivo → Descargar → PDF.<br>
+                Verifica que el PDF se vea bien antes de subirlo.
+              </div>
+              <div class="me-fbox">
+                <div class="me-fhead">
+                  <div class="me-fdots"><span class="mfd1"></span><span class="mfd2"></span><span class="mfd3"></span></div>
+                  <div class="me-flbl">// Nombre del archivo final</div>
+                </div>
+                <div class="me-frow">
+                  <div class="me-fk">Nombre del PDF</div>
+                  <div class="me-fv"><span class="me-chip" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:#06B6D4">Apellido_Nombre_Practica_N.pdf</span></div>
+                </div>
+                <div class="me-frow">
+                  <div class="me-fk">Ejemplo</div>
+                  <div class="me-fv"><span class="me-chip" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:#06B6D4">Torres_Diego_Practica_1.pdf</span></div>
+                </div>
+                <div class="me-frow">
+                  <div class="me-fk">Extensión requerida</div>
+                  <div class="me-fv"><span class="me-chip" style="background:rgba(255,123,114,.08);border:1px solid rgba(255,123,114,.2);color:#FF7B72">.pdf</span> &nbsp;— no .docx, no .png, no .jpg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="me-step">
+            <div class="me-sn">5</div>
+            <div>
+              <div class="me-stit">Sube el PDF a la plataforma EVA</div>
+              <div class="me-sdesc">Ingresa a <strong>EVA · ITB</strong>, busca la tarea de esta semana y sube el PDF antes de la <em>fecha límite indicada</em>.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div>
+        <div class="me-stitle">// Verificación antes de entregar</div>
+        <div class="me-cl">
+          <div class="me-cli"><div class="me-clchk">✓</div><div class="me-cltxt">Nombre correcto: <strong>Apellido_Nombre_Practica_N.pdf</strong></div></div>
+          <div class="me-cli"><div class="me-clchk">✓</div><div class="me-cltxt">El documento incluye <strong>capturas de pantalla</strong> claras del trabajo</div></div>
+          <div class="me-cli"><div class="me-clchk">✓</div><div class="me-cltxt">El archivo está en formato <strong>PDF</strong> — no Word, no imagen</div></div>
+          <div class="me-cli"><div class="me-clchk">✓</div><div class="me-cltxt">Subí el PDF a la tarea correcta en <strong>EVA</strong> antes del plazo</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -222,9 +532,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);
   <p>Explora el diseño interno de los sistemas computacionales: CPU, memoria, buses, arquitecturas y juego de instrucciones.</p>
 
   <div class="hero-stats">
-    <div class="stat"><div class="stat-n">2</div><div class="stat-l">Semanas</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--cyan)">1</div><div class="stat-l">Disponible</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--amber)">1</div><div class="stat-l">Próximamente</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--cyan)">2</div><div class="stat-l">Semanas</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--green)">2</div><div class="stat-l">Disponibles</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--amber)">DDR5</div><div class="stat-l">Hasta RAM</div></div>
   </div>
 
   <a href="#semanas" class="hero-cta">
@@ -266,7 +576,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);
       <div class="wc-accent acc-current"></div>
       <div class="wc-top">
         <div class="wc-num">S1</div>
-        <div class="wc-badge badge-current">● Semana actual</div>
+        <div class="wc-badge badge-current">✓ Disponible</div>
       </div>
       <div class="wc-body">
         <div class="wc-label">Semana 1</div>
@@ -294,21 +604,33 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);
     </div>
 
     <!-- SEMANA 2 -->
-    <div class="week-card soon">
-      <div class="wc-accent acc-soon"></div>
+    <div class="week-card available">
+      <div class="wc-accent acc-available"></div>
       <div class="wc-top">
         <div class="wc-num">S2</div>
-        <div class="wc-badge badge-soon">Próximamente</div>
+        <div class="wc-badge badge-available">✓ Disponible</div>
       </div>
       <div class="wc-body">
         <div class="wc-label">Semana 2</div>
-        <div class="wc-title">Por definir</div>
-        <div class="wc-desc">Contenido en planificación. Se publicará antes del inicio de la semana 2.</div>
-        <div class="wc-topics"><span class="topic">—</span></div>
+        <div class="wc-title">Buses y Memorias</div>
+        <div class="wc-desc">Buses de datos, dirección y control. PCIe, NVMe, USB. Jerarquía de memoria, RAM vs ROM, SRAM vs DRAM y la evolución completa DDR1 → DDR5.</div>
+        <div class="wc-topics">
+          <span class="topic ct">Buses</span>
+          <span class="topic ct">PCIe · NVMe</span>
+          <span class="topic ct">RAM · ROM</span>
+          <span class="topic ct">DDR1→DDR5</span>
+          <span class="topic ct">Caché · Virtual</span>
+        </div>
       </div>
-      <div class="wc-soon">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Próximamente
+      <div class="wc-files">
+        <a class="file-link" href="arq-computadoras-semana2.html">
+          <span>📖</span><span class="fl-name">arq-computadoras-semana2.html</span>
+          <span class="fl-type">10 temas</span>
+        </a>
+        <a class="file-link" href="arq-taller-semana2.html">
+          <span>🔐</span><span class="fl-name">arq-taller-semana2.html</span>
+          <span class="fl-type">taller grupos</span>
+        </a>
       </div>
     </div>
 
@@ -320,8 +642,24 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);
   <div class="footer-links">
     <a href="arq-computadoras-semana1.html">Semana 1</a>
     <a href="arq-taller-semana1.html">Taller S1</a>
+    <a href="arq-computadoras-semana2.html">Semana 2</a>
+    <a href="arq-taller-semana2.html">Taller S2</a>
   </div>
 </footer>
 
+
+<script>
+function openModal(){
+  document.getElementById('mentrega').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('mentrega').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeModal();
+});
+</script>
 </body>
 </html>
