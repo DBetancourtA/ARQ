@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura de Computadoras — Semana 2 · ITB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1117;--surface:#161B22;--surface2:#1C2129;--border:#21262D;
+  --cyan:#06B6D4;--cyan-dim:#062830;--cyan-mid:rgba(6,182,212,.15);
+  --indigo:#818CF8;--indigo-dim:#1e1b4b;
+  --green:#4ADE80;--green-dim:#1a4731;
+  --amber:#F59E0B;--amber-dim:#2d2208;
+  --red:#FF7B72;--purple:#D2A8FF;--muted:#8B949E;--text:#E6EDF3;
+  --radius:10px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(6,182,212,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(6,182,212,.025) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;
+  justify-content:space-between;padding:0 2rem;height:56px;gap:12px}
+.nav-brand{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+  color:var(--cyan);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.nav-brand .sep{color:var(--border)}.nav-brand .dim{color:var(--muted);font-weight:400}
+.nav-progress{display:flex;gap:4px;align-items:center}
+.np-dot{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s}
+.np-dot.done{background:var(--cyan)}
+.nav-badge{font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:var(--cyan-dim);border:1px solid rgba(6,182,212,.4);
+  color:var(--cyan);padding:3px 12px;border-radius:20px;white-space:nowrap}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);padding:3px 10px;border-radius:6px;white-space:nowrap;
+  text-decoration:none;transition:all .2s}
+.nav-back:hover{color:var(--text);border-color:var(--cyan)}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:64px 1.5rem 52px;text-align:center}
+.hero-chip{display:inline-flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.hero-chip::before,.hero-chip::after{content:'';width:36px;height:1px;background:var(--border)}
+.hero h1{font-family:'JetBrains Mono',monospace;font-size:clamp(2rem,5.5vw,3.6rem);
+  font-weight:700;line-height:1.08;margin-bottom:10px}
+.hero h1 .ac{color:var(--cyan)}.hero h1 .dm{color:var(--muted);font-weight:300}
+.hero-sub{font-family:'JetBrains Mono',monospace;font-size:clamp(.85rem,2vw,1.15rem);
+  color:var(--muted);margin-bottom:18px}
+.hero p{color:var(--muted);font-size:15px;max-width:560px;margin:0 auto 36px}
+.hero-meta{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;
+  color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px}
+.hero-meta span{display:flex;align-items:center;gap:6px}
+.hm-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+
+/* ── WRAP ── */
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 1.5rem}
+
+/* ── PROGRESS BAR ── */
+.progress-strip{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 24px;margin-bottom:40px;
+  display:flex;flex-direction:column;gap:10px}
+.ps-label{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  display:flex;justify-content:space-between}
+.ps-label span{color:var(--cyan)}
+.ps-track{background:var(--surface2);border-radius:20px;height:6px;overflow:hidden}
+.ps-fill{background:linear-gradient(90deg,var(--cyan),var(--indigo));
+  height:100%;border-radius:20px;width:0%;transition:width .6s ease}
+.ps-topics{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ps-topic{font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:3px 9px;border-radius:4px;cursor:pointer;transition:all .2s;
+  background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.ps-topic.done{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+
+/* ── SECTION ACCORDION ── */
+.section-block{margin-bottom:12px;border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;transition:border-color .25s}
+.section-block.active{border-color:var(--cyan)}
+.section-block.visited{border-color:rgba(6,182,212,.25)}
+.section-header{display:flex;align-items:center;gap:14px;padding:18px 22px;
+  cursor:pointer;user-select:none;transition:background .2s}
+.section-header:hover{background:var(--surface2)}
+.section-block.active .section-header{background:var(--cyan-dim)}
+.sh-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
+  color:var(--muted);background:var(--surface2);border:1px solid var(--border);
+  min-width:32px;height:32px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}
+.section-block.active .sh-num{color:var(--cyan);background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.4)}
+.section-block.visited .sh-num{color:var(--cyan);border-color:rgba(6,182,212,.3)}
+.sh-info{flex:1}
+.sh-label{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.sh-title{font-size:16px;font-weight:700}
+.sh-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.sh-tag{font-family:'JetBrains Mono',monospace;font-size:10px;
+  padding:2px 7px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.sh-toggle{font-size:18px;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.section-block.active .sh-toggle{transform:rotate(180deg);color:var(--cyan)}
+.section-body{display:none;padding:24px 24px 28px;border-top:1px solid var(--border)}
+.section-block.active .section-body{display:block}
+
+/* ── CONTENT ELEMENTS ── */
+.concept-lead{font-size:15px;color:var(--text);line-height:1.75;margin-bottom:20px}
+.concept-lead strong{color:var(--cyan)}
+.concept-lead em{color:var(--indigo);font-style:normal}
+.key-fact{background:var(--cyan-dim);border:1px solid rgba(6,182,212,.3);
+  border-radius:8px;padding:13px 17px;margin:16px 0;display:flex;gap:10px;align-items:flex-start}
+.kf-icon{color:var(--cyan);font-size:16px;flex-shrink:0}
+.kf-text{font-size:13px;color:var(--text);line-height:1.6}
+.kf-text strong{color:var(--cyan)}
+.warn-fact{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);
+  border-radius:8px;padding:13px 17px;margin:16px 0;display:flex;gap:10px;align-items:flex-start}
+.wf-text{font-size:13px;color:var(--muted);line-height:1.6}
+.wf-text strong{color:var(--amber)}
+.info-fact{background:rgba(129,140,248,.07);border:1px solid rgba(129,140,248,.25);
+  border-radius:8px;padding:13px 17px;margin:16px 0;display:flex;gap:10px;align-items:flex-start}
+.if-text{font-size:13px;color:var(--muted);line-height:1.6}
+.if-text strong{color:var(--indigo)}
+
+/* ── SEC TAG ── */
+.sec-tag{font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-tag::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── COMPARE TABLE ── */
+.compare-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.compare-table th{background:var(--surface2);color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:10px 14px;border:1px solid var(--border);text-align:left}
+.compare-table td{padding:10px 14px;border:1px solid var(--border);vertical-align:top;line-height:1.55}
+.compare-table tr:hover td{background:var(--surface2)}
+.td-hl{color:var(--cyan);font-weight:600;font-family:'JetBrains Mono',monospace}
+.td-in{color:var(--indigo);font-weight:600;font-family:'JetBrains Mono',monospace}
+.td-am{color:var(--amber);font-weight:600;font-family:'JetBrains Mono',monospace}
+.td-gn{color:var(--green);font-weight:600;font-family:'JetBrains Mono',monospace}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;margin:16px 0;
+  border-left:2px solid var(--border);padding-left:20px}
+.tl-item{padding:12px 0 12px 4px;position:relative}
+.tl-item::before{content:'';position:absolute;left:-27px;top:18px;
+  width:10px;height:10px;border-radius:50%;background:var(--surface2);
+  border:2px solid var(--border);transition:all .2s}
+.tl-item:hover::before{border-color:var(--cyan);background:var(--cyan-dim)}
+.tl-gen{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:3px}
+.tl-title{font-size:14px;font-weight:600;margin-bottom:3px}
+.tl-desc{font-size:13px;color:var(--muted);line-height:1.55}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── BUS DIAGRAM ── */
+.bus-diagram{background:#010409;border:1px solid var(--border);border-radius:9px;
+  padding:20px;margin:16px 0;overflow-x:auto;text-align:center}
+
+/* ── COMP GRID ── */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.comp-card{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:14px 16px;transition:border-color .2s}
+.comp-card:hover{border-color:var(--cyan)}
+.cc-icon{font-size:22px;margin-bottom:8px}
+.cc-name{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:5px}
+.cc-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── MEMORY HIERARCHY ── */
+.mem-pyramid{display:flex;flex-direction:column;gap:0;align-items:center;margin:16px 0;max-width:460px}
+.mem-layer{border-radius:4px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:4px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+  padding:9px 0;transition:all .2s;cursor:default;text-align:center;line-height:1.3}
+.mem-layer:hover{filter:brightness(1.15)}
+.ml-1{width:22%;background:rgba(6,182,212,.3);border:1px solid var(--cyan);color:var(--cyan)}
+.ml-2{width:38%;background:rgba(129,140,248,.25);border:1px solid var(--indigo);color:var(--indigo)}
+.ml-3{width:56%;background:rgba(74,222,128,.2);border:1px solid var(--green);color:var(--green)}
+.ml-4{width:73%;background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber)}
+.ml-5{width:88%;background:rgba(255,123,114,.1);border:1px solid var(--red);color:var(--red)}
+.ml-6{width:100%;background:rgba(139,148,158,.1);border:1px solid var(--muted);color:var(--muted)}
+.mem-labels{display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);width:100%;margin-top:8px}
+
+/* ── DDR CARD ── */
+.ddr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin:16px 0}
+.ddr-card{border:1px solid var(--border);border-radius:8px;padding:14px;
+  background:var(--surface2);transition:all .2s}
+.ddr-card:hover{transform:translateY(-2px)}
+.ddr-gen{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-bottom:5px}
+.ddr-year{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px}
+.ddr-stat{font-size:12px;color:var(--muted);margin-bottom:3px;line-height:1.4}
+.ddr-stat strong{font-family:'JetBrains Mono',monospace;font-size:12px}
+.d1{border-color:rgba(139,148,158,.3)}.d1 .ddr-gen{color:var(--muted)}
+.d2{border-color:rgba(74,222,128,.3)}.d2 .ddr-gen{color:var(--green)}
+.d3{border-color:rgba(6,182,212,.3)}.d3 .ddr-gen{color:var(--cyan)}
+.d4{border-color:rgba(129,140,248,.3)}.d4 .ddr-gen{color:var(--indigo)}
+.d5{border-color:rgba(245,158,11,.3)}.d5 .ddr-gen{color:var(--amber)}
+
+/* ── DOWNLOAD ── */
+.btn-dl{display:inline-flex;align-items:center;gap:7px;background:var(--cyan);color:#0D1117;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  padding:9px 20px;border-radius:7px;border:none;cursor:pointer;
+  transition:opacity .2s,transform .15s;margin-top:8px}
+.btn-dl:hover{opacity:.85;transform:translateY(-1px)}
+
+/* ── NAV BOTTOM ── */
+.nav-bottom{display:flex;gap:12px;margin-top:40px;padding-bottom:32px;
+  justify-content:space-between;flex-wrap:wrap}
+.nb-btn{font-family:'JetBrains Mono',monospace;font-size:12px;padding:9px 18px;
+  border-radius:7px;text-decoration:none;border:1px solid var(--border);
+  color:var(--muted);background:var(--surface);transition:all .2s}
+.nb-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.nb-btn.primary{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(6,182,212,.35)}
+.nb-btn.primary:hover{background:var(--cyan);color:#0D1117}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);
+  padding:28px 2rem;text-align:center;color:var(--muted);
+  font-size:13px;font-family:'JetBrains Mono',monospace;margin-top:20px}
+footer span{color:var(--cyan)}
+
+@media(max-width:600px){
+  nav{padding:0 1rem}.nav-brand .dim{display:none}
+  .hero h1{font-size:2rem}
+  .section-header{padding:14px 16px}
+  .section-body{padding:18px 16px 20px}
+  .ddr-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M9 2v2M15 20v2M9 20v2M2 15h2M2 9h2M20 15h2M20 9h2"/></svg>
+    ITB <span class="sep">/</span> <span class="dim">arq-computadoras</span> <span class="sep">/</span> semana-2
+  </div>
+  <div class="nav-progress" id="nav-dots"></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="nav-badge">⬡ Semana 2 — 10 temas</div>
+    <a class="nav-back" href="ARQ.html">↩ Índice ARQ</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">Instituto Tecnológico de Negocios · Semana 2 de 2</div>
+  <h1>
+    <span class="dm">Buses y</span><br>
+    <span class="ac">Memorias</span>
+  </h1>
+  <div class="hero-sub">Cómo viajan los datos · Dónde se almacenan · Qué tan rápido</div>
+  <p>10 temas organizados para proyectar en clase. Haz clic en cada bloque para expandirlo y marca los temas a medida que avanzas.</p>
+  <div class="hero-meta">
+    <span><span class="hm-dot"></span>10 temas</span>
+    <span><span class="hm-dot"></span>Semana 2</span>
+    <span><span class="hm-dot"></span>Teoría + Diagramas</span>
+    <span><span class="hm-dot"></span>DDR1→DDR5</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- PROGRESS STRIP -->
+<div class="progress-strip">
+  <div class="ps-label">
+    <span>// Progreso de la clase — Semana 2</span>
+    <span id="ps-count">0 / 10 temas</span>
+  </div>
+  <div class="ps-track"><div class="ps-fill" id="ps-fill"></div></div>
+  <div class="ps-topics" id="ps-topics"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 1 — ¿QUÉ ES UN BUS?
+══════════════════════════════════════ -->
+<div class="section-block" id="sb0">
+  <div class="section-header" onclick="toggle(0)">
+    <div class="sh-num">01</div>
+    <div class="sh-info">
+      <div class="sh-label">// Concepto fundamental</div>
+      <div class="sh-title">¿Qué es un Bus de datos?</div>
+      <div class="sh-tags"><span class="sh-tag">bus</span><span class="sh-tag">comunicación</span><span class="sh-tag">hardware</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">Un <strong>bus</strong> es un conjunto de líneas de comunicación que conecta los componentes de una computadora — CPU, memoria y dispositivos I/O — y permite que los datos viajen entre ellos. Piénsalo como una <em>autopista de datos</em> dentro del computador.</div>
+
+    <div class="bus-diagram">
+      <svg width="680" height="180" viewBox="0 0 680 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- CPU -->
+        <rect x="20" y="55" width="110" height="70" rx="8" fill="#062830" stroke="#06B6D4" stroke-width="1.5"/>
+        <text x="75" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#06B6D4">CPU</text>
+        <text x="75" y="104" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Procesador</text>
+        <!-- RAM -->
+        <rect x="285" y="30" width="110" height="50" rx="8" fill="#1e1b4b" stroke="#818CF8" stroke-width="1.5"/>
+        <text x="340" y="52" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#818CF8">RAM</text>
+        <text x="340" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Mem. Principal</text>
+        <!-- ROM -->
+        <rect x="285" y="100" width="110" height="50" rx="8" fill="#1a4731" stroke="#4ADE80" stroke-width="1.5"/>
+        <text x="340" y="122" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#4ADE80">ROM</text>
+        <text x="340" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Mem. Solo Lectura</text>
+        <!-- I/O -->
+        <rect x="550" y="55" width="110" height="70" rx="8" fill="#2d2208" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="605" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#F59E0B">I/O</text>
+        <text x="605" y="104" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8B949E">Dispositivos</text>
+        <!-- Bus lines -->
+        <line x1="130" y1="90" x2="285" y2="55" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6,3"/>
+        <line x1="130" y1="90" x2="285" y2="125" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6,3"/>
+        <line x1="395" y1="55" x2="550" y2="75" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6,3"/>
+        <line x1="395" y1="125" x2="550" y2="105" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6,3"/>
+        <!-- Bus label -->
+        <rect x="148" y="78" width="130" height="24" rx="4" fill="#062830" stroke="#06B6D4" stroke-width="1"/>
+        <text x="213" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#06B6D4">BUS DEL SISTEMA</text>
+        <rect x="408" y="78" width="130" height="24" rx="4" fill="#062830" stroke="#06B6D4" stroke-width="1"/>
+        <text x="473" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#06B6D4">BUS DEL SISTEMA</text>
+        <!-- Arrows -->
+        <polygon points="278,52 290,55 278,58" fill="#06B6D4"/>
+        <polygon points="278,122 290,125 278,128" fill="#06B6D4"/>
+        <polygon points="543,72 555,75 543,78" fill="#06B6D4"/>
+        <polygon points="543,102 555,105 543,108" fill="#06B6D4"/>
+      </svg>
+    </div>
+
+    <div class="key-fact">
+      <div class="kf-icon">⬡</div>
+      <div class="kf-text"><strong>Ancho de bus:</strong> indica cuántos bits viajan simultáneamente. Un bus de 64 bits transfiere el doble de datos por ciclo que uno de 32 bits. Cuanto más ancho el bus, mayor la capacidad de transferencia.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 2 — TIPOS DE BUS
+══════════════════════════════════════ -->
+<div class="section-block" id="sb1">
+  <div class="section-header" onclick="toggle(1)">
+    <div class="sh-num">02</div>
+    <div class="sh-info">
+      <div class="sh-label">// Clasificación</div>
+      <div class="sh-title">Tipos de Bus: datos, dirección y control</div>
+      <div class="sh-tags"><span class="sh-tag">bus de datos</span><span class="sh-tag">bus de dirección</span><span class="sh-tag">bus de control</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">El bus del sistema se divide en <strong>tres tipos</strong> según la función que cumplen. Cada uno transporta un tipo distinto de información entre la CPU y el resto del sistema.</div>
+
+    <table class="compare-table">
+      <tr><th>Tipo de Bus</th><th>¿Qué transporta?</th><th>Dirección</th><th>Bits típicos</th></tr>
+      <tr>
+        <td><span class="td-hl">Bus de Datos</span></td>
+        <td>Los datos reales que se procesan (números, instrucciones, resultados)</td>
+        <td>Bidireccional ↔</td>
+        <td>8 / 16 / 32 / 64 bits</td>
+      </tr>
+      <tr>
+        <td><span class="td-in">Bus de Dirección</span></td>
+        <td>La ubicación de memoria donde leer o escribir datos</td>
+        <td>Unidireccional → (CPU → Mem)</td>
+        <td>16 / 32 / 64 bits</td>
+      </tr>
+      <tr>
+        <td><span class="td-am">Bus de Control</span></td>
+        <td>Señales de gestión: leer, escribir, interrupciones, reloj</td>
+        <td>Bidireccional ↔</td>
+        <td>4 – 16 líneas</td>
+      </tr>
+    </table>
+
+    <div class="key-fact">
+      <div class="kf-icon">💡</div>
+      <div class="kf-text"><strong>Analogía:</strong> el <strong>Bus de Dirección</strong> es como la dirección de una casa. El <strong>Bus de Datos</strong> es el paquete que se entrega. El <strong>Bus de Control</strong> es el mensajero que indica si debe dejar o recoger el paquete.</div>
+    </div>
+
+    <div class="warn-fact">
+      <div style="font-size:16px;flex-shrink:0">⚠️</div>
+      <div class="wf-text"><strong>Bus de dirección determina la RAM máxima:</strong> con un bus de dirección de N bits, la CPU puede acceder a 2ᴺ posiciones de memoria. Un bus de 32 bits → máximo 4 GB de RAM (2³² = 4,294,967,296 bytes). Por eso los sistemas de 64 bits soportan terabytes de RAM.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 3 — BUSES MODERNOS
+══════════════════════════════════════ -->
+<div class="section-block" id="sb2">
+  <div class="section-header" onclick="toggle(2)">
+    <div class="sh-num">03</div>
+    <div class="sh-info">
+      <div class="sh-label">// Estándares actuales</div>
+      <div class="sh-title">Buses modernos: PCIe, USB, SATA, NVMe</div>
+      <div class="sh-tags"><span class="sh-tag">PCIe</span><span class="sh-tag">USB</span><span class="sh-tag">SATA</span><span class="sh-tag">NVMe</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">Los buses modernos han reemplazado a los buses paralelos clásicos. Usan comunicación <strong>serial</strong> — menos cables pero a velocidades altísimas. Cada estándar tiene un uso específico.</div>
+
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="cc-icon">⚡</div>
+        <div class="cc-name">PCIe</div>
+        <div class="cc-desc">PCI Express. Conecta tarjetas de video, SSDs NVMe y accesorios de alto rendimiento. PCIe 5.0 alcanza 128 GB/s con 16 carriles.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🔌</div>
+        <div class="cc-name">USB</div>
+        <div class="cc-desc">Universal Serial Bus. Periféricos externos: teclados, memorias, cámaras. USB 4.0 llega a 40 Gbps.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">💾</div>
+        <div class="cc-name">SATA</div>
+        <div class="cc-desc">Serial ATA. Conecta HDDs y SSDs SATA. Velocidad máxima 6 Gbps (SATA III). Más lento que NVMe.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🚀</div>
+        <div class="cc-name">NVMe</div>
+        <div class="cc-desc">Non-Volatile Memory Express. SSDs directamente sobre PCIe. Gen 4 alcanza 7 GB/s. El más rápido para almacenamiento.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🌐</div>
+        <div class="cc-name">Thunderbolt</div>
+        <div class="cc-desc">Desarrollado por Intel + Apple. Combina PCIe y DisplayPort. Thunderbolt 4 ofrece 40 Gbps bidireccionales.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">📡</div>
+        <div class="cc-name">DMI / HyperTransport</div>
+        <div class="cc-desc">Buses internos que conectan la CPU con el chipset (Intel: DMI, AMD: Infinity Fabric). No visibles al usuario.</div>
+      </div>
+    </div>
+
+    <div class="info-fact">
+      <div style="font-size:16px;flex-shrink:0">📌</div>
+      <div class="if-text"><strong>Bus serie vs. Bus paralelo:</strong> los buses antiguos eran paralelos (muchos cables simultáneos), pero a altas frecuencias el ruido eléctrico entre cables causaba errores. Los buses serie modernos usan pocos cables pero a frecuencias altísimas, logrando mayor velocidad y confiabilidad.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 4 — ¿QUÉ ES LA MEMORIA?
+══════════════════════════════════════ -->
+<div class="section-block" id="sb3">
+  <div class="section-header" onclick="toggle(3)">
+    <div class="sh-num">04</div>
+    <div class="sh-info">
+      <div class="sh-label">// Concepto fundamental</div>
+      <div class="sh-title">¿Qué es la memoria de una computadora?</div>
+      <div class="sh-tags"><span class="sh-tag">memoria</span><span class="sh-tag">almacenamiento temporal</span><span class="sh-tag">bytes</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">La <strong>memoria</strong> es el espacio donde la computadora almacena temporalmente los datos e instrucciones que está procesando en este momento. Sin memoria, la CPU no tendría con qué trabajar — sería como un cerebro sin recuerdos de corto plazo.</div>
+
+    <div class="key-fact">
+      <div class="kf-icon">⬡</div>
+      <div class="kf-text"><strong>Diferencia clave:</strong> la <strong>memoria</strong> (RAM) es temporal y volátil — pierde todo al apagarse. El <strong>almacenamiento</strong> (HDD/SSD) es permanente y no volátil — conserva los datos aunque no haya energía.</div>
+    </div>
+
+    <div class="sec-tag">// Unidades de medida de memoria</div>
+    <table class="compare-table">
+      <tr><th>Unidad</th><th>Abreviatura</th><th>Equivalencia</th><th>Ejemplo real</th></tr>
+      <tr><td>Bit</td><td><span class="td-hl">b</span></td><td>Un 0 o un 1</td><td>El mínimo de información</td></tr>
+      <tr><td>Byte</td><td><span class="td-hl">B</span></td><td>8 bits</td><td>Un carácter de texto</td></tr>
+      <tr><td>Kilobyte</td><td><span class="td-hl">KB</span></td><td>1,024 bytes</td><td>Un email de texto</td></tr>
+      <tr><td>Megabyte</td><td><span class="td-hl">MB</span></td><td>1,024 KB</td><td>Una foto JPEG</td></tr>
+      <tr><td>Gigabyte</td><td><span class="td-hl">GB</span></td><td>1,024 MB</td><td>Un módulo de RAM típico</td></tr>
+      <tr><td>Terabyte</td><td><span class="td-hl">TB</span></td><td>1,024 GB</td><td>Un HDD doméstico</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 5 — JERARQUÍA DE MEMORIA
+══════════════════════════════════════ -->
+<div class="section-block" id="sb4">
+  <div class="section-header" onclick="toggle(4)">
+    <div class="sh-num">05</div>
+    <div class="sh-info">
+      <div class="sh-label">// Organización</div>
+      <div class="sh-title">Jerarquía de memoria — Pirámide de velocidad</div>
+      <div class="sh-tags"><span class="sh-tag">registros</span><span class="sh-tag">caché</span><span class="sh-tag">RAM</span><span class="sh-tag">disco</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">La memoria no es un sistema único — existe una <strong>jerarquía</strong>: más arriba es más rápida y cara, pero más pequeña. Más abajo es más lenta y barata, pero con mayor capacidad. La CPU siempre busca los datos empezando desde arriba.</div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin:20px 0">
+      <div class="mem-pyramid">
+        <div class="mem-layer ml-1">Registros de CPU</div>
+        <div class="mem-layer ml-2">Caché L1 / L2 / L3</div>
+        <div class="mem-layer ml-3">RAM (Memoria Principal)</div>
+        <div class="mem-layer ml-4">SSD / NVMe</div>
+        <div class="mem-layer ml-5">HDD (Disco Duro)</div>
+        <div class="mem-layer ml-6">Almacenamiento externo / Nube</div>
+        <div class="mem-labels"><span>← Más rápido</span><span>Más grande →</span></div>
+      </div>
+      <div style="flex:1;min-width:220px">
+        <table class="compare-table">
+          <tr><th>Nivel</th><th>Velocidad</th><th>Capacidad</th></tr>
+          <tr><td><span class="td-hl">Registros</span></td><td>~1 ciclo CPU</td><td>Bytes</td></tr>
+          <tr><td><span class="td-in">Caché L1</span></td><td>~4 ciclos</td><td>32–64 KB</td></tr>
+          <tr><td><span class="td-in">Caché L2</span></td><td>~12 ciclos</td><td>256 KB–1 MB</td></tr>
+          <tr><td><span class="td-in">Caché L3</span></td><td>~40 ciclos</td><td>4–64 MB</td></tr>
+          <tr><td><span class="td-gn">RAM</span></td><td>~100 ns</td><td>4–128 GB</td></tr>
+          <tr><td><span class="td-am">SSD NVMe</span></td><td>~50 µs</td><td>250 GB–8 TB</td></tr>
+          <tr><td style="color:var(--red)">HDD</td><td>~5–10 ms</td><td>500 GB–20 TB</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="warn-fact">
+      <div style="font-size:16px;flex-shrink:0">⚠️</div>
+      <div class="wf-text"><strong>Principio de localidad:</strong> los programas tienden a acceder repetidamente a las mismas zonas de memoria (localidad temporal) y a posiciones cercanas entre sí (localidad espacial). La caché explota este principio para anticipar qué datos necesitará la CPU.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 6 — RAM vs ROM
+══════════════════════════════════════ -->
+<div class="section-block" id="sb5">
+  <div class="section-header" onclick="toggle(5)">
+    <div class="sh-num">06</div>
+    <div class="sh-info">
+      <div class="sh-label">// Tipos de memoria principal</div>
+      <div class="sh-title">RAM vs ROM — Volátil y No Volátil</div>
+      <div class="sh-tags"><span class="sh-tag">RAM</span><span class="sh-tag">ROM</span><span class="sh-tag">EEPROM</span><span class="sh-tag">Flash</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead"><strong>RAM</strong> (Random Access Memory) es <em>volátil</em>: almacena temporalmente lo que la CPU está usando ahora mismo. <strong>ROM</strong> (Read-Only Memory) es <em>no volátil</em>: contiene instrucciones permanentes grabadas de fábrica, como el firmware de arranque (BIOS/UEFI).</div>
+
+    <table class="compare-table">
+      <tr><th>Característica</th><th>RAM</th><th>ROM</th></tr>
+      <tr><td>Volatilidad</td><td><span class="td-hl">Volátil</span> — pierde datos al apagarse</td><td><span class="td-gn">No volátil</span> — persiste sin energía</td></tr>
+      <tr><td>Lectura/Escritura</td><td>Lectura y escritura en tiempo real</td><td>Solo lectura (o escritura muy lenta)</td></tr>
+      <tr><td>Velocidad</td><td>Muy rápida (nanosegundos)</td><td>Más lenta que RAM</td></tr>
+      <tr><td>Uso típico</td><td>Programas en ejecución, datos activos</td><td>BIOS, firmware, microcódigo</td></tr>
+      <tr><td>Capacidad típica</td><td>4 GB – 128 GB en PCs</td><td>Megabytes (firmware)</td></tr>
+    </table>
+
+    <div class="sec-tag">// Variantes de ROM moderna</div>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="cc-icon">📀</div>
+        <div class="cc-name">PROM</div>
+        <div class="cc-desc">Programmable ROM. Se programa una sola vez con un dispositivo especial. No se puede modificar después.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🔄</div>
+        <div class="cc-name">EPROM</div>
+        <div class="cc-desc">Erasable PROM. Se borra con luz ultravioleta y se reprograma. Identificable por su ventana de cuarzo.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">⚡</div>
+        <div class="cc-name">EEPROM</div>
+        <div class="cc-desc">Electrically Erasable PROM. Se borra y reprograma eléctricamente. Base del almacenamiento Flash actual.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🚀</div>
+        <div class="cc-name">Flash (NAND)</div>
+        <div class="cc-desc">Evolución de EEPROM. Rápida, barata y compacta. Usada en SSDs, USB drives, tarjetas SD y smartphones.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 7 — TIPOS DE RAM: SRAM vs DRAM
+══════════════════════════════════════ -->
+<div class="section-block" id="sb6">
+  <div class="section-header" onclick="toggle(6)">
+    <div class="sh-num">07</div>
+    <div class="sh-info">
+      <div class="sh-label">// Tecnología interna</div>
+      <div class="sh-title">SRAM vs DRAM — Caché vs Memoria principal</div>
+      <div class="sh-tags"><span class="sh-tag">SRAM</span><span class="sh-tag">DRAM</span><span class="sh-tag">caché</span><span class="sh-tag">refresco</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">La RAM no es un solo tipo de tecnología. <strong>SRAM</strong> y <strong>DRAM</strong> se construyen de manera diferente, lo que les da características opuestas: velocidad vs. capacidad vs. costo.</div>
+
+    <table class="compare-table">
+      <tr><th>Característica</th><th>SRAM (Static)</th><th>DRAM (Dynamic)</th></tr>
+      <tr><td>Tecnología</td><td>Flip-flops (6 transistores/bit)</td><td>Capacitor + transistor (1 transistor/bit)</td></tr>
+      <tr><td>Velocidad</td><td><span class="td-hl">Muy rápida</span> (~1 ns)</td><td>Más lenta (~10–100 ns)</td></tr>
+      <tr><td>Refresco</td><td>No necesita refresco</td><td><span class="td-am">Necesita refresco periódico</span> (cada ~64 ms)</td></tr>
+      <tr><td>Densidad</td><td>Baja (ocupa más espacio)</td><td><span class="td-gn">Alta</span> (más bits por chip)</td></tr>
+      <tr><td>Costo</td><td>Muy cara</td><td>Más económica</td></tr>
+      <tr><td>Uso típico</td><td>Caché L1, L2, L3 dentro de la CPU</td><td>RAM del sistema (módulos DIMM)</td></tr>
+    </table>
+
+    <div class="key-fact">
+      <div class="kf-icon">⬡</div>
+      <div class="kf-text"><strong>¿Por qué DRAM necesita refresco?</strong> Los capacitores que almacenan cada bit pierden su carga eléctrica con el tiempo. El controlador de memoria debe "releer y reescribir" constantemente los datos para que no se pierdan — eso es el refresco dinámico.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 8 — EVOLUCIÓN DDR1 a DDR5
+══════════════════════════════════════ -->
+<div class="section-block" id="sb7">
+  <div class="section-header" onclick="toggle(7)">
+    <div class="sh-num">08</div>
+    <div class="sh-info">
+      <div class="sh-label">// Historia y evolución</div>
+      <div class="sh-title">Evolución de la RAM: DDR1 → DDR5</div>
+      <div class="sh-tags"><span class="sh-tag">DDR</span><span class="sh-tag">SDRAM</span><span class="sh-tag">velocidad</span><span class="sh-tag">voltaje</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead"><strong>DDR</strong> significa <em>Double Data Rate</em> — transfiere datos dos veces por ciclo de reloj (en el flanco de subida y bajada). Cada generación duplica aproximadamente el ancho de banda y reduce el voltaje para mayor eficiencia energética.</div>
+
+    <div class="ddr-grid">
+      <div class="ddr-card d1">
+        <div class="ddr-gen">DDR1</div>
+        <div class="ddr-year">1998 – 2004</div>
+        <div class="ddr-stat">⚡ <strong>200–400 MT/s</strong></div>
+        <div class="ddr-stat">📦 <strong>64–512 MB</strong> típico</div>
+        <div class="ddr-stat">🔋 <strong>2.5 V</strong></div>
+        <div class="ddr-stat">📌 184 pines (DIMM)</div>
+        <div class="ddr-stat" style="margin-top:6px;font-size:11px">Primera generación DDR. Reemplazó a SDRAM. Ya obsoleta.</div>
+      </div>
+      <div class="ddr-card d2">
+        <div class="ddr-gen">DDR2</div>
+        <div class="ddr-year">2003 – 2008</div>
+        <div class="ddr-stat">⚡ <strong>400–1066 MT/s</strong></div>
+        <div class="ddr-stat">📦 <strong>512 MB – 4 GB</strong></div>
+        <div class="ddr-stat">🔋 <strong>1.8 V</strong></div>
+        <div class="ddr-stat">📌 240 pines (DIMM)</div>
+        <div class="ddr-stat" style="margin-top:6px;font-size:11px">Prefetch de 4 bits. Menor voltaje, mayor densidad que DDR1.</div>
+      </div>
+      <div class="ddr-card d3">
+        <div class="ddr-gen">DDR3</div>
+        <div class="ddr-year">2007 – 2014</div>
+        <div class="ddr-stat">⚡ <strong>800–2133 MT/s</strong></div>
+        <div class="ddr-stat">📦 <strong>1–16 GB</strong> por módulo</div>
+        <div class="ddr-stat">🔋 <strong>1.5 V</strong> (1.35 V LP)</div>
+        <div class="ddr-stat">📌 240 pines (DIMM)</div>
+        <div class="ddr-stat" style="margin-top:6px;font-size:11px">Prefetch de 8 bits. Estándar dominante por casi una década.</div>
+      </div>
+      <div class="ddr-card d4">
+        <div class="ddr-gen">DDR4</div>
+        <div class="ddr-year">2014 – 2022</div>
+        <div class="ddr-stat">⚡ <strong>1600–3200 MT/s</strong></div>
+        <div class="ddr-stat">📦 <strong>4–32 GB</strong> por módulo</div>
+        <div class="ddr-stat">🔋 <strong>1.2 V</strong></div>
+        <div class="ddr-stat">📌 288 pines (DIMM)</div>
+        <div class="ddr-stat" style="margin-top:6px;font-size:11px">Banco de 16 grupos. Mayor fiabilidad y XMP overclock.</div>
+      </div>
+      <div class="ddr-card d5">
+        <div class="ddr-gen">DDR5</div>
+        <div class="ddr-year">2020 – Presente</div>
+        <div class="ddr-stat">⚡ <strong>4800–8400+ MT/s</strong></div>
+        <div class="ddr-stat">📦 <strong>16–128 GB</strong> por módulo</div>
+        <div class="ddr-stat">🔋 <strong>1.1 V</strong></div>
+        <div class="ddr-stat">📌 288 pines (nuevo notch)</div>
+        <div class="ddr-stat" style="margin-top:6px;font-size:11px">2 canales independientes por DIMM. ECC integrado en el módulo.</div>
+      </div>
+    </div>
+
+    <div class="key-fact">
+      <div class="kf-icon">📊</div>
+      <div class="kf-text"><strong>MT/s vs MHz:</strong> la velocidad de RAM se expresaba en MHz (frecuencia efectiva) pero actualmente se usa MT/s (megatransferencias por segundo) porque DDR transfiere datos dos veces por ciclo. DDR4-3200 trabaja a 1600 MHz físicos pero hace 3200 millones de transferencias por segundo.</div>
+    </div>
+
+    <div class="warn-fact">
+      <div style="font-size:16px;flex-shrink:0">⚠️</div>
+      <div class="wf-text"><strong>Incompatibilidad entre generaciones:</strong> DDR1, DDR2, DDR3, DDR4 y DDR5 tienen conectores físicamente incompatibles — el número de pines y la posición de la muesca cambian en cada generación para evitar instalarlos incorrectamente. No se puede usar un módulo DDR4 en una placa madre DDR5.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 9 — MEMORIA CACHÉ
+══════════════════════════════════════ -->
+<div class="section-block" id="sb8">
+  <div class="section-header" onclick="toggle(8)">
+    <div class="sh-num">09</div>
+    <div class="sh-info">
+      <div class="sh-label">// Optimización de rendimiento</div>
+      <div class="sh-title">Memoria Caché — El buffer de alta velocidad de la CPU</div>
+      <div class="sh-tags"><span class="sh-tag">caché L1</span><span class="sh-tag">caché L2</span><span class="sh-tag">caché L3</span><span class="sh-tag">hit/miss</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">La <strong>caché</strong> es una pequeña cantidad de memoria SRAM ultra-rápida integrada dentro del chip de la CPU. Su función es guardar las instrucciones y datos que la CPU usa con más frecuencia, evitando el costoso viaje hasta la RAM principal.</div>
+
+    <table class="compare-table">
+      <tr><th>Nivel</th><th>Ubicación</th><th>Tamaño típico</th><th>Latencia</th><th>Compartida</th></tr>
+      <tr>
+        <td><span class="td-hl">L1</span></td>
+        <td>Dentro de cada núcleo</td>
+        <td>32–64 KB por núcleo</td>
+        <td>~1–4 ciclos</td>
+        <td>No (privada)</td>
+      </tr>
+      <tr>
+        <td><span class="td-in">L2</span></td>
+        <td>Dentro de cada núcleo</td>
+        <td>256 KB – 2 MB por núcleo</td>
+        <td>~12 ciclos</td>
+        <td>No (privada)</td>
+      </tr>
+      <tr>
+        <td><span class="td-gn">L3</span></td>
+        <td>Compartida entre todos los núcleos</td>
+        <td>4–64 MB (o más)</td>
+        <td>~30–40 ciclos</td>
+        <td>Sí (todos los núcleos)</td>
+      </tr>
+    </table>
+
+    <div class="sec-tag">// Cache Hit y Cache Miss</div>
+    <div class="comp-grid" style="grid-template-columns:1fr 1fr">
+      <div class="comp-card" style="border-color:rgba(74,222,128,.3)">
+        <div class="cc-icon">✅</div>
+        <div class="cc-name" style="color:var(--green)">Cache HIT</div>
+        <div class="cc-desc">Los datos que necesita la CPU están en la caché. Se obtienen en pocos ciclos. El rendimiento es máximo. En programas bien optimizados, el hit rate supera el 95%.</div>
+      </div>
+      <div class="comp-card" style="border-color:rgba(255,123,114,.3)">
+        <div class="cc-icon">❌</div>
+        <div class="cc-name" style="color:var(--red)">Cache MISS</div>
+        <div class="cc-desc">Los datos no están en caché. La CPU debe ir a buscarlos en RAM (o peor, en disco). Puede suponer esperar 100+ ciclos. Es el principal cuello de botella de rendimiento.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOQUE 10 — MEMORIA VIRTUAL
+══════════════════════════════════════ -->
+<div class="section-block" id="sb9">
+  <div class="section-header" onclick="toggle(9)">
+    <div class="sh-num">10</div>
+    <div class="sh-info">
+      <div class="sh-label">// Sistema operativo + hardware</div>
+      <div class="sh-title">Memoria Virtual — Más RAM de la que tienes físicamente</div>
+      <div class="sh-tags"><span class="sh-tag">memoria virtual</span><span class="sh-tag">paginación</span><span class="sh-tag">swap</span><span class="sh-tag">MMU</span></div>
+    </div>
+    <div class="sh-toggle">▾</div>
+  </div>
+  <div class="section-body">
+    <div class="concept-lead">La <strong>memoria virtual</strong> es una técnica que permite a los programas usar más memoria de la que hay físicamente instalada. El sistema operativo utiliza una porción del disco duro como extensión de la RAM — llamada <em>archivo de intercambio (swap)</em>.</div>
+
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="cc-icon">🗺️</div>
+        <div class="cc-name">Paginación</div>
+        <div class="cc-desc">La memoria se divide en bloques de tamaño fijo llamados páginas (típicamente 4 KB). La MMU traduce las direcciones virtuales a físicas en tiempo real.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🔄</div>
+        <div class="cc-name">Swap / Page file</div>
+        <div class="cc-desc">Cuando la RAM se llena, el SO mueve páginas menos usadas al disco. Esto es mucho más lento pero evita que el sistema se bloquee.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🧭</div>
+        <div class="cc-name">MMU</div>
+        <div class="cc-desc">Memory Management Unit. Chip (integrado en la CPU) que realiza la traducción de direcciones virtuales a físicas automáticamente en cada acceso a memoria.</div>
+      </div>
+      <div class="comp-card">
+        <div class="cc-icon">🛡️</div>
+        <div class="cc-name">Protección de memoria</div>
+        <div class="cc-desc">La memoria virtual también aísla los espacios de cada proceso. Un programa no puede acceder a la memoria de otro — esto previene crashes y ataques de seguridad.</div>
+      </div>
+    </div>
+
+    <div class="warn-fact">
+      <div style="font-size:16px;flex-shrink:0">⚠️</div>
+      <div class="wf-text"><strong>Thrashing:</strong> cuando el sistema usa constantemente el swap porque la RAM es insuficiente, el rendimiento cae drásticamente. El disco funciona a 1000x más lento que la RAM. La solución es agregar más RAM física, no más swap.</div>
+    </div>
+
+    <div class="key-fact">
+      <div class="kf-icon">💡</div>
+      <div class="kf-text"><strong>En la práctica:</strong> Windows usa el archivo <strong>pagefile.sys</strong> como swap. Linux usa una partición dedicada <strong>swap</strong> o un archivo swapfile. macOS comprime primero la memoria antes de usar swap (memoria comprimida).</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav-bottom">
+  <a class="nb-btn" href="arq-computadoras-semana1.html">← Semana 1 — Fundamentos</a>
+  <a class="nb-btn" href="ARQ.html">↩ Índice ARQ</a>
+  <a class="nb-btn primary" href="arq-taller-semana2.html">Taller S2 — RAM DDR →</a>
+</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  ITB — Instituto Tecnológico de Negocios &nbsp;·&nbsp;
+  <span>ARQ — Semana 2 · Buses y Memorias</span>
+</footer>
+
+<script>
+const TOPICS = [
+  "¿Qué es un Bus?","Tipos de Bus","Buses Modernos","¿Qué es la Memoria?",
+  "Jerarquía de Memoria","RAM vs ROM","SRAM vs DRAM","DDR1→DDR5","Caché","Memoria Virtual"
+];
+const TOTAL = TOPICS.length;
+const KEY = 'arq_s2_v1';
+let visited = JSON.parse(localStorage.getItem(KEY)||'[]');
+if(visited.length!==TOTAL) visited=Array(TOTAL).fill(false);
+
+/* build nav dots */
+const nd = document.getElementById('nav-dots');
+TOPICS.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='np-dot'+(visited[i]?' done':'');
+  d.title=TOPICS[i];
+  d.onclick=()=>{document.getElementById('sb'+i).scrollIntoView({behavior:'smooth'})};
+  nd.appendChild(d);
+});
+
+/* build ps-topics */
+const pt = document.getElementById('ps-topics');
+TOPICS.forEach((t,i)=>{
+  const s=document.createElement('span');
+  s.className='ps-topic'+(visited[i]?' done':'');
+  s.textContent=t;
+  s.onclick=()=>{document.getElementById('sb'+i).scrollIntoView({behavior:'smooth'})};
+  pt.appendChild(s);
+});
+
+function updateUI(){
+  const done=visited.filter(Boolean).length;
+  document.getElementById('ps-count').textContent=done+' / '+TOTAL+' temas';
+  document.getElementById('ps-fill').style.width=(done/TOTAL*100)+'%';
+  visited.forEach((v,i)=>{
+    nd.children[i].classList.toggle('done',v);
+    pt.children[i].classList.toggle('done',v);
+  });
+  localStorage.setItem(KEY,JSON.stringify(visited));
+}
+
+function toggle(i){
+  const block=document.getElementById('sb'+i);
+  const wasActive=block.classList.contains('active');
+  document.querySelectorAll('.section-block').forEach(b=>b.classList.remove('active'));
+  if(!wasActive){
+    block.classList.add('active','visited');
+    if(!visited[i]){visited[i]=true;updateUI();}
+  }
+}
+
+updateUI();
+</script>
+</body>
+</html>
