@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller Semana 2 — RAM DDR · ARQ ITB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  CONFIGURACIÓN DEL DOCENTE — edita solo esta sección        ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+const ACCESS_PASSWORDS = {
+  1: "ddr1memoria",    // Grupo 1 — DDR1 y DDR2
+  2: "ddr3evolve",     // Grupo 2 — DDR3
+  3: "ddr4moderno",    // Grupo 3 — DDR4
+  4: "ddr5futuro",     // Grupo 4 — DDR5
+  5: "cachememoria5"   // Grupo 5 — Caché y Memoria Virtual
+};
+
+const SOLUTION_PASSWORD = "arqitb2025s2"; // ← clave maestra docente
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1117;--surface:#161B22;--surface2:#1C2129;--border:#21262D;
+  --cyan:#06B6D4;--cyan-dim:#062830;
+  --indigo:#818CF8;--indigo-dim:#1e1b4b;
+  --green:#4ADE80;--green-dim:#1a4731;
+  --amber:#F59E0B;--amber-dim:#2d2208;
+  --red:#FF7B72;--purple:#A855F7;--muted:#8B949E;--text:#E6EDF3;--radius:10px;
+  --g1:#3B82F6;--g1-dim:rgba(59,130,246,.1);
+  --g2:#EAB308;--g2-dim:rgba(234,179,8,.1);
+  --g3:#22C55E;--g3-dim:rgba(34,197,94,.1);
+  --g4:#8B5CF6;--g4-dim:rgba(139,92,246,.1);
+  --g5:#F97316;--g5-dim:rgba(249,115,22,.1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.65}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(6,182,212,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(6,182,212,.025) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.92);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:54px;gap:12px}
+.nav-brand{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;
+  color:var(--cyan);display:flex;align-items:center;gap:7px;white-space:nowrap}
+.nav-brand .sep{color:var(--border)}.nav-brand .dim{color:var(--muted);font-weight:400}
+.nav-timer{font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--amber);display:flex;align-items:center;gap:6px}
+#td{font-size:16px;font-weight:700;min-width:58px}
+.tbtn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;
+  border-radius:5px;cursor:pointer;transition:all .2s}
+.tbtn:hover{color:var(--text);border-color:var(--muted)}
+.tbtn.on{background:var(--cyan-dim);color:var(--cyan);border-color:var(--cyan)}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);padding:3px 10px;border-radius:6px;
+  text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-back:hover{color:var(--text);border-color:var(--cyan)}
+
+/* HERO */
+.hero{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:56px 1.5rem 40px;text-align:center}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px;
+  display:flex;align-items:center;justify-content:center;gap:10px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';flex:1;max-width:60px;height:1px;background:var(--border)}
+.hero h1{font-family:'JetBrains Mono',monospace;font-size:clamp(1.8rem,4.5vw,2.8rem);
+  font-weight:700;line-height:1.1;margin-bottom:10px}
+.hero h1 .ac{color:var(--cyan)}.hero h1 .dm{color:var(--muted)}
+.hero p{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto 28px;line-height:1.7}
+.hero-meta{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:32px}
+.hm-badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;
+  border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.hm-badge.active{background:var(--cyan-dim);border-color:rgba(6,182,212,.4);color:var(--cyan)}
+
+/* GROUPS SELECTOR */
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 1.5rem}
+.groups-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:32px}
+@media(max-width:640px){.groups-grid{grid-template-columns:1fr 1fr}}
+.gcard{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 12px;text-align:center;
+  cursor:pointer;transition:all .22s}
+.gcard:hover{transform:translateY(-3px)}
+.gc-num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;margin-bottom:4px}
+.gc-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.gc-topic{font-size:11px;color:var(--muted);line-height:1.4}
+.g1c{border-color:rgba(59,130,246,.3)}.g1c .gc-num{color:var(--g1)}
+.g1c:hover{border-color:var(--g1);background:var(--g1-dim)}
+.g2c{border-color:rgba(234,179,8,.3)}.g2c .gc-num{color:var(--g2)}
+.g2c:hover{border-color:var(--g2);background:var(--g2-dim)}
+.g3c{border-color:rgba(34,197,94,.3)}.g3c .gc-num{color:var(--g3)}
+.g3c:hover{border-color:var(--g3);background:var(--g3-dim)}
+.g4c{border-color:rgba(139,92,246,.3)}.g4c .gc-num{color:var(--g4)}
+.g4c:hover{border-color:var(--g4);background:var(--g4-dim)}
+.g5c{border-color:rgba(249,115,22,.3)}.g5c .gc-num{color:var(--g5)}
+.g5c:hover{border-color:var(--g5);background:var(--g5-dim)}
+
+/* ACCESS PANEL */
+.access-panel{display:none;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;margin-bottom:24px;text-align:center}
+.access-panel.vis{display:block}
+.ap-title{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;margin-bottom:6px}
+.ap-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.key-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.key-input{background:#010409;border:1px solid var(--border);color:var(--text);
+  font-family:'JetBrains Mono',monospace;font-size:15px;padding:10px 16px;
+  border-radius:7px;width:240px;outline:none;letter-spacing:.12em;text-align:center;
+  transition:border-color .2s}
+.key-input:focus{border-color:var(--cyan)}
+.key-btn{background:var(--cyan);color:#0D1117;font-family:'JetBrains Mono',monospace;
+  font-weight:700;font-size:14px;padding:10px 22px;border-radius:7px;
+  border:none;cursor:pointer;transition:opacity .2s}
+.key-btn:hover{opacity:.85}
+.key-err{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red);
+  margin-top:10px;display:none}
+
+/* MISSION PANEL */
+.mission-panel{display:none}
+.mission-panel.vis{display:block}
+.mp-head{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px 26px;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.mph-left{display:flex;align-items:center;gap:14px}
+.mph-badge{width:50px;height:50px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;flex-shrink:0}
+.mph-title{font-size:18px;font-weight:700;margin-bottom:3px}
+.mph-sub{font-size:13px;color:var(--muted)}
+.mph-timer{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--amber)}
+.mph-tlabel{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center}
+
+/* MISSION CONTENT */
+.mission-intro{background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:18px 22px;margin-bottom:20px;
+  font-size:14px;color:var(--muted);line-height:1.7}
+.mission-intro strong{color:var(--text)}
+.mission-intro em{font-style:normal;font-weight:600}
+
+/* INVESTIGATION BLOCK */
+.inv-block{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+.inv-head{padding:16px 20px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--border)}
+.inv-icon{font-size:20px;flex-shrink:0}
+.inv-htitle{font-size:15px;font-weight:700}
+.inv-hsub{font-size:12px;color:var(--muted);margin-top:2px;font-family:'JetBrains Mono',monospace}
+.inv-body{padding:20px}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+.data-table th{background:var(--surface2);color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;
+  letter-spacing:.08em;padding:9px 12px;border:1px solid var(--border);text-align:left}
+.data-table td{padding:9px 12px;border:1px solid var(--border);line-height:1.5;color:var(--muted)}
+.data-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:600}
+.data-table tr:hover td{background:var(--surface2)}
+
+/* QUESTIONS */
+.questions-list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.question-item{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  padding:3px 8px;border-radius:4px;flex-shrink:0;margin-top:1px}
+.q-text{font-size:14px;color:var(--text);line-height:1.6}
+.q-hint{font-size:12px;color:var(--muted);margin-top:5px;font-style:italic}
+
+/* DELIVERABLE */
+.deliverable{background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:18px 22px;margin-top:20px}
+.dl-title{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.dl-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.dl-items{display:flex;flex-direction:column;gap:8px}
+.dl-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
+.dl-check{color:var(--green);flex-shrink:0;font-weight:700;margin-top:1px}
+.dl-item strong{color:var(--text)}
+
+/* SOLUTION PANEL */
+.solution-banner{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.25);
+  border-radius:9px;padding:14px 18px;margin-top:20px;font-size:13px;color:var(--muted);
+  display:flex;gap:10px;align-items:center}
+.solution-banner strong{color:var(--green)}
+
+/* GLOBAL SOLUTION */
+.global-solution{display:none;background:var(--surface);border:1px solid rgba(74,222,128,.3);
+  border-radius:var(--radius);padding:28px;margin-top:32px}
+.global-solution.vis{display:block}
+.gs-title{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+  color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px}
+.gs-title::after{content:'';flex:1;height:1px;background:rgba(74,222,128,.2)}
+.gs-group{background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:16px 20px;margin-bottom:12px}
+.gsg-head{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;margin-bottom:10px}
+.gsg-answers{display:flex;flex-direction:column;gap:6px}
+.gsg-ans{font-size:13px;color:var(--muted);padding:6px 0;
+  border-bottom:1px solid var(--border);line-height:1.5}
+.gsg-ans:last-child{border-bottom:none}
+.gsg-ans strong{color:var(--text)}
+
+footer{border-top:1px solid var(--border);padding:26px 2rem;text-align:center;
+  color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;margin-top:48px;
+  position:relative;z-index:1}
+footer span{color:var(--cyan)}
+
+@media(max-width:600px){
+  nav{padding:0 1rem}.nav-brand .dim{display:none}
+  .groups-grid{grid-template-columns:1fr 1fr 1fr}
+  .mp-head{flex-direction:column;gap:10px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    ITB <span class="sep">/</span> <span class="dim">arq</span> <span class="sep">/</span> taller-semana-2
+  </div>
+  <div class="nav-timer">
+    ⏱ <span id="td">45:00</span>
+    <button class="tbtn" id="tbtn" onclick="toggleTimer()">▶ iniciar</button>
+    <button class="tbtn" onclick="resetTimer()">↺</button>
+  </div>
+  <a class="nav-back" href="arq-computadoras-semana2.html">↩ Semana 2</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Semana 2 · Taller grupal · ARQ ITB</div>
+  <h1><span class="dm">Taller —</span><br><span class="ac">Investigación RAM DDR</span></h1>
+  <p>Cada grupo recibe su clave de acceso, investiga una generación de RAM y responde las preguntas de análisis. Al final se socializa en clase.</p>
+  <div class="hero-meta">
+    <span class="hm-badge active">5 Grupos</span>
+    <span class="hm-badge active">45 minutos</span>
+    <span class="hm-badge">DDR1 → DDR5</span>
+    <span class="hm-badge">Investigación + Análisis</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- GROUPS GRID -->
+<div id="selector-section">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+    // Selecciona tu grupo
+    <span style="flex:1;height:1px;background:var(--border);display:block"></span>
+  </div>
+  <div class="groups-grid">
+    <div class="gcard g1c" onclick="selectGroup(1)">
+      <div class="gc-num">G1</div>
+      <div class="gc-label">Grupo 1</div>
+      <div class="gc-topic">DDR1 y DDR2<br>Los orígenes</div>
+    </div>
+    <div class="gcard g2c" onclick="selectGroup(2)">
+      <div class="gc-num">G2</div>
+      <div class="gc-label">Grupo 2</div>
+      <div class="gc-topic">DDR3<br>La era dorada</div>
+    </div>
+    <div class="gcard g3c" onclick="selectGroup(3)">
+      <div class="gc-num">G3</div>
+      <div class="gc-label">Grupo 3</div>
+      <div class="gc-topic">DDR4<br>La generación moderna</div>
+    </div>
+    <div class="gcard g4c" onclick="selectGroup(4)">
+      <div class="gc-num">G4</div>
+      <div class="gc-label">Grupo 4</div>
+      <div class="gc-topic">DDR5<br>El futuro ahora</div>
+    </div>
+    <div class="gcard g5c" onclick="selectGroup(5)">
+      <div class="gc-num">G5</div>
+      <div class="gc-label">Grupo 5</div>
+      <div class="gc-topic">Caché y<br>Memoria Virtual</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCESS PANELS (one per group) -->
+<div id="access-1" class="access-panel">
+  <div class="ap-title" style="color:var(--g1)">🔒 Grupo 1 — DDR1 y DDR2</div>
+  <div class="ap-sub">Ingresa la clave que te dio el docente para acceder a tu misión</div>
+  <div class="key-form">
+    <input class="key-input" id="ki-1" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')checkKey(1)">
+    <button class="key-btn" onclick="checkKey(1)" style="background:var(--g1)">Acceder</button>
+  </div>
+  <div class="key-err" id="ke-1">⚠ Clave incorrecta. Intenta de nuevo.</div>
+</div>
+
+<div id="access-2" class="access-panel">
+  <div class="ap-title" style="color:var(--g2)">🔒 Grupo 2 — DDR3</div>
+  <div class="ap-sub">Ingresa la clave que te dio el docente para acceder a tu misión</div>
+  <div class="key-form">
+    <input class="key-input" id="ki-2" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')checkKey(2)">
+    <button class="key-btn" onclick="checkKey(2)" style="background:var(--g2);color:#0D1117">Acceder</button>
+  </div>
+  <div class="key-err" id="ke-2">⚠ Clave incorrecta. Intenta de nuevo.</div>
+</div>
+
+<div id="access-3" class="access-panel">
+  <div class="ap-title" style="color:var(--g3)">🔒 Grupo 3 — DDR4</div>
+  <div class="ap-sub">Ingresa la clave que te dio el docente para acceder a tu misión</div>
+  <div class="key-form">
+    <input class="key-input" id="ki-3" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')checkKey(3)">
+    <button class="key-btn" onclick="checkKey(3)" style="background:var(--g3);color:#0D1117">Acceder</button>
+  </div>
+  <div class="key-err" id="ke-3">⚠ Clave incorrecta. Intenta de nuevo.</div>
+</div>
+
+<div id="access-4" class="access-panel">
+  <div class="ap-title" style="color:var(--g4)">🔒 Grupo 4 — DDR5</div>
+  <div class="ap-sub">Ingresa la clave que te dio el docente para acceder a tu misión</div>
+  <div class="key-form">
+    <input class="key-input" id="ki-4" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')checkKey(4)">
+    <button class="key-btn" onclick="checkKey(4)" style="background:var(--g4)">Acceder</button>
+  </div>
+  <div class="key-err" id="ke-4">⚠ Clave incorrecta. Intenta de nuevo.</div>
+</div>
+
+<div id="access-5" class="access-panel">
+  <div class="ap-title" style="color:var(--g5)">🔒 Grupo 5 — Caché y Memoria Virtual</div>
+  <div class="ap-sub">Ingresa la clave que te dio el docente para acceder a tu misión</div>
+  <div class="key-form">
+    <input class="key-input" id="ki-5" type="password" placeholder="clave del grupo" onkeydown="if(event.key==='Enter')checkKey(5)">
+    <button class="key-btn" onclick="checkKey(5)" style="background:var(--g5)">Acceder</button>
+  </div>
+  <div class="key-err" id="ke-5">⚠ Clave incorrecta. Intenta de nuevo.</div>
+</div>
+
+<!-- ══════════════════════
+     MISSION 1 — DDR1 y DDR2
+══════════════════════ -->
+<div id="mission-1" class="mission-panel">
+  <div class="mp-head">
+    <div class="mph-left">
+      <div class="mph-badge" style="background:var(--g1-dim);border:1px solid rgba(59,130,246,.3);color:var(--g1)">G1</div>
+      <div>
+        <div class="mph-title">Grupo 1 — DDR1 y DDR2: Los Orígenes</div>
+        <div class="mph-sub">Investigación grupal · Semana 2 · ARQ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mission-intro">
+    Su grupo investigará las <strong>dos primeras generaciones de RAM DDR</strong>: DDR1 (1998–2004) y DDR2 (2003–2008). Comprendan cómo nació la tecnología DDR, qué la diferenciaba de la SDRAM anterior y qué mejoras trajo DDR2. Usen la información base de abajo como punto de partida — amplíen con sus propias fuentes.
+  </div>
+
+  <!-- DDR1 -->
+  <div class="inv-block">
+    <div class="inv-head" style="background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.2)">
+      <div class="inv-icon">💾</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--g1)">DDR1 — Double Data Rate SDRAM</div>
+        <div class="inv-hsub">1998 · JEDEC · 184 pines · 2.5 V</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <table class="data-table">
+        <tr><th>Parámetro</th><th>Valor</th><th>Nota</th></tr>
+        <tr><td>Año de lanzamiento</td><td>1998 (espec.) / 2000 (comercial)</td><td>Primera RAM DDR del mercado</td></tr>
+        <tr><td>Velocidad</td><td>200 – 400 MT/s</td><td>DDR-200 a DDR-400</td></tr>
+        <tr><td>Voltaje</td><td>2.5 V (2.6 V máx.)</td><td>Mayor que generaciones posteriores</td></tr>
+        <tr><td>Pines (DIMM)</td><td>184 pines</td><td>Incompatible con DDR2+</td></tr>
+        <tr><td>Prefetch</td><td>2n (2 bits por ciclo)</td><td>Dobla el ancho de banda vs. SDRAM</td></tr>
+        <tr><td>Capacidad máxima</td><td>1 GB por módulo</td><td>Muy limitada vs. estándares actuales</td></tr>
+        <tr><td>CAS Latency</td><td>CL2 – CL3</td><td>Latencias bajas a su época</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- DDR2 -->
+  <div class="inv-block">
+    <div class="inv-head" style="background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.2)">
+      <div class="inv-icon">📀</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--g1)">DDR2 — La evolución necesaria</div>
+        <div class="inv-hsub">2003 · JEDEC · 240 pines · 1.8 V</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <table class="data-table">
+        <tr><th>Parámetro</th><th>Valor</th><th>Mejora vs DDR1</th></tr>
+        <tr><td>Año de lanzamiento</td><td>2003 (espec.) / 2004 (comercial)</td><td>—</td></tr>
+        <tr><td>Velocidad</td><td>400 – 1066 MT/s</td><td>Hasta 2.5× más rápida</td></tr>
+        <tr><td>Voltaje</td><td>1.8 V</td><td>28% menos consumo</td></tr>
+        <tr><td>Pines (DIMM)</td><td>240 pines</td><td>Nueva muesca, incompatible con DDR1</td></tr>
+        <tr><td>Prefetch</td><td>4n (4 bits por ciclo)</td><td>Doble que DDR1</td></tr>
+        <tr><td>Capacidad máxima</td><td>4 GB por módulo</td><td>4× más que DDR1</td></tr>
+        <tr><td>CAS Latency</td><td>CL4 – CL6</td><td>Mayor latencia pero mayor ancho de banda</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Preguntas G1 -->
+  <div class="inv-block">
+    <div class="inv-head" style="background:var(--cyan-dim);border-color:rgba(6,182,212,.2)">
+      <div class="inv-icon">❓</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--cyan)">Preguntas de análisis — Grupo 1</div>
+        <div class="inv-hsub">Respondan en grupo y prepárense para exponer</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <div class="questions-list">
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g1-dim);color:var(--g1);border:1px solid rgba(59,130,246,.3)">Q1</div>
+          <div>
+            <div class="q-text">¿Qué significa exactamente "Double Data Rate"? ¿Por qué DDR transfiere datos dos veces por ciclo de reloj y la SDRAM convencional solo una?</div>
+            <div class="q-hint">Pista: piensen en el flanco de subida y bajada de la señal de reloj.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g1-dim);color:var(--g1);border:1px solid rgba(59,130,246,.3)">Q2</div>
+          <div>
+            <div class="q-text">DDR1 tiene 184 pines y DDR2 tiene 240 pines. ¿Por qué aumentaron los pines si en teoría el módulo es del mismo tamaño físico (DIMM)? ¿Qué señales adicionales necesita DDR2?</div>
+            <div class="q-hint">Pista: investiga las señales de diferencial y las terminaciones en DDR2.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g1-dim);color:var(--g1);border:1px solid rgba(59,130,246,.3)">Q3</div>
+          <div>
+            <div class="q-text">DDR2 tiene mayor CAS Latency que DDR1 (CL4–6 vs CL2–3), lo que en teoría significa mayor latencia. Sin embargo DDR2 es más rápida en rendimiento real. ¿Cómo es posible esta aparente contradicción?</div>
+            <div class="q-hint">Pista: la CAS Latency se mide en ciclos, pero la frecuencia de reloj es diferente.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g1-dim);color:var(--g1);border:1px solid rgba(59,130,246,.3)">Q4</div>
+          <div>
+            <div class="q-text">¿Aún se usan sistemas con DDR1 o DDR2 hoy en día? Investiguen en qué tipo de equipos o entornos podría seguir encontrándose esta memoria. ¿Qué limitaciones impone al sistema operativo y software moderno?</div>
+            <div class="q-hint">Pista: piensen en sistemas embebidos, equipos industriales y países en desarrollo.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g1-dim);color:var(--g1);border:1px solid rgba(59,130,246,.3)">Q5</div>
+          <div>
+            <div class="q-text">Calculen el ancho de banda teórico máximo de DDR1-400 y DDR2-1066. Recuerden que el bus de datos es de 64 bits (8 bytes). Comparen los resultados con la velocidad de un HDD de 7200 RPM típico de esa época.</div>
+            <div class="q-hint">Fórmula: Ancho de banda = (MT/s × bits de bus) / 8 = GB/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deliverable">
+    <div class="dl-title">// Entregable del Grupo 1</div>
+    <div class="dl-items">
+      <div class="dl-item"><div class="dl-check">✓</div><div>Una <strong>tabla comparativa completa</strong> entre DDR1 y DDR2 con todos los parámetros técnicos</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Respuestas argumentadas a las <strong>5 preguntas de análisis</strong></div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Un <strong>párrafo de conclusión</strong>: ¿qué problema venía a resolver DDR2 que DDR1 no podía solucionar?</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Preparar una <strong>exposición de 3 minutos</strong> para socializar con los demás grupos</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MISSION 2 — DDR3
+══════════════════════ -->
+<div id="mission-2" class="mission-panel">
+  <div class="mp-head">
+    <div class="mph-left">
+      <div class="mph-badge" style="background:var(--g2-dim);border:1px solid rgba(234,179,8,.3);color:var(--g2)">G2</div>
+      <div>
+        <div class="mph-title">Grupo 2 — DDR3: La Era Dorada</div>
+        <div class="mph-sub">Investigación grupal · Semana 2 · ARQ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mission-intro">
+    Su grupo investigará <strong>DDR3</strong> (2007–2014), el estándar que dominó el mercado durante casi una década y equipó a millones de PCs de escritorio, laptops y servidores. Analicen qué lo hizo tan exitoso, sus variantes y por qué tardó tanto en ser reemplazado.
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:rgba(234,179,8,.05);border-color:rgba(234,179,8,.2)">
+      <div class="inv-icon">🏆</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--g2)">DDR3 — El estándar por una década</div>
+        <div class="inv-hsub">2007 · JEDEC · 240 pines · 1.5 V</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <table class="data-table">
+        <tr><th>Parámetro</th><th>DDR3 Estándar</th><th>DDR3L (Low Voltage)</th></tr>
+        <tr><td>Lanzamiento</td><td>2007</td><td>2010</td></tr>
+        <tr><td>Velocidad</td><td>800 – 2133 MT/s</td><td>800 – 1866 MT/s</td></tr>
+        <tr><td>Voltaje</td><td>1.5 V</td><td>1.35 V</td></tr>
+        <tr><td>Pines DIMM</td><td>240 pines</td><td>204 pines (SO-DIMM laptop)</td></tr>
+        <tr><td>Prefetch</td><td>8n</td><td>8n</td></tr>
+        <tr><td>Capacidad máxima</td><td>16 GB por módulo</td><td>8 GB por módulo (típico)</td></tr>
+        <tr><td>CAS Latency</td><td>CL9 – CL13</td><td>CL9 – CL11</td></tr>
+        <tr><td>Canales</td><td>Single/Dual/Triple channel</td><td>Single/Dual</td></tr>
+        <tr><td>Ancho de banda máx.</td><td>17 GB/s (DDR3-2133)</td><td>~15 GB/s</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:var(--cyan-dim);border-color:rgba(6,182,212,.2)">
+      <div class="inv-icon">❓</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--cyan)">Preguntas de análisis — Grupo 2</div>
+        <div class="inv-hsub">Respondan en grupo y prepárense para exponer</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <div class="questions-list">
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g2-dim);color:var(--g2);border:1px solid rgba(234,179,8,.3)">Q1</div>
+          <div>
+            <div class="q-text">DDR3 usa un prefetch de 8n (8 bits leídos internamente por cada acceso externo). ¿Cómo impacta esto en el rendimiento comparado con el prefetch 4n de DDR2? ¿Qué ventaja y qué desventaja tiene un prefetch más grande?</div>
+            <div class="q-hint">Pista: mayor prefetch = más datos por operación, pero también más latencia interna.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g2-dim);color:var(--g2);border:1px solid rgba(234,179,8,.3)">Q2</div>
+          <div>
+            <div class="q-text">¿Qué es el modo "Dual Channel" en DDR3 y qué beneficio concreto tiene? Si una PC tiene 8 GB en Dual Channel vs 8 GB en Single Channel, ¿qué diferencia hay en rendimiento real y por qué?</div>
+            <div class="q-hint">Pista: piensen en el ancho de bus que se duplica al usar dos módulos en paralelo.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g2-dim);color:var(--g2);border:1px solid rgba(234,179,8,.3)">Q3</div>
+          <div>
+            <div class="q-text">DDR3 duró en el mercado casi 10 años (2007–2017 en muchos sistemas). ¿A qué factores atribuyen esta extraordinaria longevidad? Consideren aspectos económicos, de compatibilidad y de necesidades del mercado.</div>
+            <div class="q-hint">Pista: ¿por qué los fabricantes de placas madre tardaron tanto en adoptar DDR4?</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g2-dim);color:var(--g2);border:1px solid rgba(234,179,8,.3)">Q4</div>
+          <div>
+            <div class="q-text">Investiguen qué es el XMP (Extreme Memory Profile) en DDR3. ¿Quién lo creó, para qué sirve y cómo se activa? ¿Es seguro usarlo o tiene riesgos?</div>
+            <div class="q-hint">Pista: XMP es un estándar de Intel para overclock de memoria certificado por el fabricante del módulo.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g2-dim);color:var(--g2);border:1px solid rgba(234,179,8,.3)">Q5</div>
+          <div>
+            <div class="q-text">Un usuario tiene una laptop con DDR3 de 4 GB a 1333 MHz y quiere mejorar su rendimiento. Enumeren y expliquen al menos 3 opciones de mejora reales (incluyendo cuándo tiene sentido ampliar RAM vs cambiar a SSD vs ambas), con argumentos técnicos basados en los conceptos de caché, ancho de banda y jerarquía de memoria.</div>
+            <div class="q-hint">Pista: consideren cuándo el cuello de botella es RAM vs almacenamiento vs CPU.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deliverable">
+    <div class="dl-title">// Entregable del Grupo 2</div>
+    <div class="dl-items">
+      <div class="dl-item"><div class="dl-check">✓</div><div>Ficha técnica completa de <strong>DDR3 y DDR3L</strong> con todos sus parámetros clave</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Explicación del <strong>funcionamiento de Dual Channel</strong> con un diagrama si es posible</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Respuestas argumentadas a las <strong>5 preguntas de análisis</strong></div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Exposición de <strong>3 minutos</strong> explicando qué hizo especial a DDR3</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MISSION 3 — DDR4
+══════════════════════ -->
+<div id="mission-3" class="mission-panel">
+  <div class="mp-head">
+    <div class="mph-left">
+      <div class="mph-badge" style="background:var(--g3-dim);border:1px solid rgba(34,197,94,.3);color:var(--g3)">G3</div>
+      <div>
+        <div class="mph-title">Grupo 3 — DDR4: La Generación Moderna</div>
+        <div class="mph-sub">Investigación grupal · Semana 2 · ARQ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mission-intro">
+    Su grupo investigará <strong>DDR4</strong> (2014–presente), el estándar que introdujo cambios arquitecturales importantes: bancos de memoria reorganizados, voltaje reducido, mayor densidad y el perfil XMP 2.0. Es la memoria estándar en la mayoría de PCs profesionales actuales.
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:rgba(34,197,94,.05);border-color:rgba(34,197,94,.2)">
+      <div class="inv-icon">🚀</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--g3)">DDR4 — El estándar profesional actual</div>
+        <div class="inv-hsub">2014 · JEDEC · 288 pines · 1.2 V</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <table class="data-table">
+        <tr><th>Parámetro</th><th>Valor DDR4</th><th>vs DDR3</th></tr>
+        <tr><td>Lanzamiento comercial</td><td>2014 (Intel Haswell-E)</td><td>7 años después de DDR3</td></tr>
+        <tr><td>Velocidad base</td><td>1600 – 3200 MT/s</td><td>Hasta 1.5× más rápido</td></tr>
+        <tr><td>Velocidad OC (XMP 2.0)</td><td>Hasta 4800+ MT/s</td><td>Mucho mayor headroom</td></tr>
+        <tr><td>Voltaje estándar</td><td>1.2 V</td><td>20% menos que DDR3</td></tr>
+        <tr><td>Pines DIMM</td><td>288 pines</td><td>48 pines más, nueva muesca</td></tr>
+        <tr><td>Prefetch</td><td>8n (igual que DDR3)</td><td>Mismo prefetch</td></tr>
+        <tr><td>Bancos de memoria</td><td>16 bancos (4 Bank Groups de 4)</td><td>DDR3 tiene 8 bancos</td></tr>
+        <tr><td>Capacidad máxima</td><td>128 GB por módulo (LRDIMM)</td><td>8× más que DDR3</td></tr>
+        <tr><td>Ancho de banda máx.</td><td>~38 GB/s (DDR4-4800)</td><td>Más del doble</td></tr>
+        <tr><td>ECC</td><td>Disponible (servidor)</td><td>Corrección de errores en datos críticos</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:var(--cyan-dim);border-color:rgba(6,182,212,.2)">
+      <div class="inv-icon">❓</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--cyan)">Preguntas de análisis — Grupo 3</div>
+        <div class="inv-hsub">Respondan en grupo y prepárense para exponer</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <div class="questions-list">
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g3-dim);color:var(--g3);border:1px solid rgba(34,197,94,.3)">Q1</div>
+          <div>
+            <div class="q-text">DDR4 mantiene el mismo prefetch de 8n que DDR3, pero duplica los bancos (de 8 a 16 divididos en 4 Bank Groups). Expliquen cómo esta organización en Bank Groups mejora el rendimiento. ¿Qué operación permite hacer que los 8 bancos de DDR3 no podían?</div>
+            <div class="q-hint">Pista: los Bank Groups permiten operaciones de forma simultánea que DDR3 tenía que serializar.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g3-dim);color:var(--g3);border:1px solid rgba(34,197,94,.3)">Q2</div>
+          <div>
+            <div class="q-text">¿Qué es la memoria ECC (Error-Correcting Code) y por qué es crítica en servidores pero generalmente innecesaria en PCs de consumo? Investiguen cómo detecta y corrige errores de 1 bit automáticamente.</div>
+            <div class="q-hint">Pista: investiguen el algoritmo de Hamming y el concepto de flip de bit espontáneo (bit flip).</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g3-dim);color:var(--g3);border:1px solid rgba(34,197,94,.3)">Q3</div>
+          <div>
+            <div class="q-text">En 2021–2022, los precios de la RAM DDR4 cayeron drásticamente mientras DDR5 llegaba al mercado. Analicen los factores económicos y técnicos que determinan el precio de los módulos de RAM. ¿Por qué la RAM es más cara cuando es nueva y baja de precio con el tiempo?</div>
+            <div class="q-hint">Pista: investiguen los ciclos de precio de la DRAM y el rol de empresas como Samsung, SK Hynix y Micron.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g3-dim);color:var(--g3);border:1px solid rgba(34,197,94,.3)">Q4</div>
+          <div>
+            <div class="q-text">DDR4 a 3200 MHz tiene menor latencia real (en nanosegundos) que DDR4 a 2133 MHz aunque tenga mayor CAS Latency en ciclos. Calculen y demuestren matemáticamente esta afirmación usando la fórmula de latencia real en nanosegundos.</div>
+            <div class="q-hint">Fórmula: Latencia real (ns) = (CL / Frecuencia real en MHz) × 2000</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g3-dim);color:var(--g3);border:1px solid rgba(34,197,94,.3)">Q5</div>
+          <div>
+            <div class="q-text">Investiguen la diferencia entre UDIMM, RDIMM y LRDIMM en DDR4. ¿Cuál es para escritorio doméstico, cuál para servidor de entrada y cuál para servidores de alto rendimiento? ¿Qué característica física y funcional distingue a cada uno?</div>
+            <div class="q-hint">Pista: busquen el significado de "registered" y "load-reduced" en el contexto de memoria de servidor.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deliverable">
+    <div class="dl-title">// Entregable del Grupo 3</div>
+    <div class="dl-items">
+      <div class="dl-item"><div class="dl-check">✓</div><div>Tabla completa de <strong>especificaciones DDR4</strong> incluyendo variantes (UDIMM, RDIMM, SO-DIMM)</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Cálculo demostrado de la <strong>latencia real en ns</strong> para al menos 3 configuraciones DDR4</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Respuestas argumentadas a las <strong>5 preguntas</strong></div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Exposición de <strong>3 minutos</strong> explicando qué hace diferente a DDR4 internamente</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MISSION 4 — DDR5
+══════════════════════ -->
+<div id="mission-4" class="mission-panel">
+  <div class="mp-head">
+    <div class="mph-left">
+      <div class="mph-badge" style="background:var(--g4-dim);border:1px solid rgba(139,92,246,.3);color:var(--g4)">G4</div>
+      <div>
+        <div class="mph-title">Grupo 4 — DDR5: El Futuro Ahora</div>
+        <div class="mph-sub">Investigación grupal · Semana 2 · ARQ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mission-intro">
+    Su grupo investigará <strong>DDR5</strong> (2020–presente), la generación más reciente que introduce cambios arquitecturales radicales: dos canales independientes por módulo, regulación de voltaje en el módulo mismo (PMIC), ECC integrado y velocidades que duplican a DDR4.
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:rgba(139,92,246,.05);border-color:rgba(139,92,246,.2)">
+      <div class="inv-icon">⚡</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--g4)">DDR5 — La revolución de la RAM</div>
+        <div class="inv-hsub">2020 (espec.) · 2021 (Intel Alder Lake) · 288 pines · 1.1 V</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <table class="data-table">
+        <tr><th>Parámetro</th><th>DDR5</th><th>vs DDR4</th></tr>
+        <tr><td>Lanzamiento espec. JEDEC</td><td>Julio 2020</td><td>6 años después de DDR4</td></tr>
+        <tr><td>1er CPU compatible</td><td>Intel Alder Lake (Nov 2021)</td><td>AMD: Ryzen 7000 (Sep 2022)</td></tr>
+        <tr><td>Velocidad base JEDEC</td><td>4800 MT/s</td><td>3× la velocidad base de DDR4</td></tr>
+        <tr><td>Velocidad OC</td><td>6000 – 8400+ MT/s</td><td>Mucho mayor headroom</td></tr>
+        <tr><td>Voltaje operación</td><td>1.1 V</td><td>8% menos que DDR4</td></tr>
+        <tr><td>Pines DIMM</td><td>288 pines (nueva muesca)</td><td>Mismo número, muesca diferente</td></tr>
+        <tr><td>Canales por módulo</td><td>2 canales × 32 bits</td><td>DDR4 tiene 1 canal × 64 bits</td></tr>
+        <tr><td>Bancos</td><td>32 bancos (8 Bank Groups × 4)</td><td>Doble que DDR4</td></tr>
+        <tr><td>Prefetch</td><td>16n</td><td>Doble que DDR4</td></tr>
+        <tr><td>Capacidad máxima</td><td>128 GB por módulo</td><td>Igual que DDR4 LRDIMM</td></tr>
+        <tr><td>PMIC integrado</td><td>Sí (Power Management IC en módulo)</td><td>DDR4 usaba regulación en la placa</td></tr>
+        <tr><td>ECC en módulo</td><td>On-die ECC (en el chip de memoria)</td><td>DDR4 solo en variantes de servidor</td></tr>
+        <tr><td>Ancho de banda</td><td>hasta ~67 GB/s</td><td>~1.75× DDR4</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:var(--cyan-dim);border-color:rgba(6,182,212,.2)">
+      <div class="inv-icon">❓</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--cyan)">Preguntas de análisis — Grupo 4</div>
+        <div class="inv-hsub">Respondan en grupo y prepárense para exponer</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <div class="questions-list">
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g4-dim);color:var(--g4);border:1px solid rgba(139,92,246,.3)">Q1</div>
+          <div>
+            <div class="q-text">DDR5 divide cada módulo en dos canales independientes de 32 bits en lugar del canal único de 64 bits de DDR4. ¿Por qué esta arquitectura de dos canales mejora el rendimiento aunque el ancho de bus total sea el mismo 64 bits? ¿Qué tipo de cargas de trabajo se benefician más de esto?</div>
+            <div class="q-hint">Pista: piensen en accesos paralelos e independientes a dos bancos distintos simultáneamente.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g4-dim);color:var(--g4);border:1px solid rgba(139,92,246,.3)">Q2</div>
+          <div>
+            <div class="q-text">DDR5 incluye un PMIC (Power Management Integrated Circuit) directamente en el módulo, a diferencia de DDR4 donde la regulación estaba en la placa madre. Investiguen qué ventajas concretas tiene esto para la estabilidad, el overclocking y los fabricantes de placas madre.</div>
+            <div class="q-hint">Pista: voltaje más preciso cerca del módulo = menos ruido eléctrico = más estabilidad a altas frecuencias.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g4-dim);color:var(--g4);border:1px solid rgba(139,92,246,.3)">Q3</div>
+          <div>
+            <div class="q-text">En 2022–2023, DDR5 era significativamente más cara que DDR4 y con mayor latencia real. Muchos entusiastas preferían DDR4. Investiguen el estado actual del mercado (2024–2025): ¿la relación precio-rendimiento ya favorece a DDR5? ¿En qué escenarios concretos conviene DDR5 y en cuáles aún DDR4?</div>
+            <div class="q-hint">Pista: comparen también según el procesador: Intel 12/13/14gen y AMD Ryzen 7000.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g4-dim);color:var(--g4);border:1px solid rgba(139,92,246,.3)">Q4</div>
+          <div>
+            <div class="q-text">DDR5 tiene "on-die ECC" integrado en los chips de memoria. ¿Este ECC interno protege de la misma manera que el ECC de servidor en DDR4? ¿Qué diferencia hay entre el ECC interno del chip y el ECC de sistema completo? ¿Por qué DDR5 con on-die ECC no es lo mismo que RAM de servidor ECC?</div>
+            <div class="q-hint">Pista: el on-die ECC protege dentro del chip, pero no reporta errores al sistema operativo.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g4-dim);color:var(--g4);border:1px solid rgba(139,92,246,.3)">Q5</div>
+          <div>
+            <div class="q-text">Analicen el futuro de la RAM: ¿qué viene después de DDR5? Investiguen LPDDR5X (memoria de bajo consumo para móviles), HBM (High Bandwidth Memory para GPUs e IA) y las propuestas teóricas de DDR6. ¿En qué dirección evoluciona la memoria de computadoras?</div>
+            <div class="q-hint">Pista: HBM se usa en GPUs como A100 de NVIDIA y en chips de IA — investíguen por qué es tan diferente a DDR.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deliverable">
+    <div class="dl-title">// Entregable del Grupo 4</div>
+    <div class="dl-items">
+      <div class="dl-item"><div class="dl-check">✓</div><div>Ficha técnica completa de <strong>DDR5</strong> con todas sus innovaciones arquitecturales</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Comparativa <strong>DDR4 vs DDR5</strong>: ¿cuándo conviene cada una hoy en día?</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Respuestas argumentadas a las <strong>5 preguntas</strong></div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Exposición de <strong>3 minutos</strong> + visión del futuro de la memoria RAM</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MISSION 5 — CACHÉ Y MEMORIA VIRTUAL
+══════════════════════ -->
+<div id="mission-5" class="mission-panel">
+  <div class="mp-head">
+    <div class="mph-left">
+      <div class="mph-badge" style="background:var(--g5-dim);border:1px solid rgba(249,115,22,.3);color:var(--g5)">G5</div>
+      <div>
+        <div class="mph-title">Grupo 5 — Caché y Memoria Virtual</div>
+        <div class="mph-sub">Investigación grupal · Semana 2 · ARQ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mission-intro">
+    Su grupo investigará dos conceptos de alto nivel: la <strong>memoria caché</strong> (L1/L2/L3) y la <strong>memoria virtual</strong> (paginación, swap, MMU). Estos mecanismos son transparentes al usuario pero fundamentales para el rendimiento del sistema. Analicen cómo funcionan, cómo interactúan y cómo afectan la experiencia real.
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.2)">
+      <div class="inv-icon">⚡</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--g5)">Memoria Caché — El buffer secreto de la CPU</div>
+        <div class="inv-hsub">SRAM · L1/L2/L3 · Hit Rate · Coherencia</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <table class="data-table">
+        <tr><th>Nivel</th><th>Tamaño típico</th><th>Latencia</th><th>Ubicación</th><th>Compartida</th></tr>
+        <tr><td>L1-I (instrucciones)</td><td>32–64 KB</td><td>1–2 ciclos</td><td>Dentro de cada núcleo</td><td>No</td></tr>
+        <tr><td>L1-D (datos)</td><td>32–64 KB</td><td>4 ciclos</td><td>Dentro de cada núcleo</td><td>No</td></tr>
+        <tr><td>L2</td><td>256 KB – 2 MB</td><td>12–14 ciclos</td><td>Dentro de cada núcleo</td><td>No</td></tr>
+        <tr><td>L3 (LLC)</td><td>6–64 MB</td><td>30–50 ciclos</td><td>Fuera de los núcleos</td><td>Sí (todos)</td></tr>
+        <tr><td>RAM</td><td>4–128 GB</td><td>100–300 ciclos</td><td>Fuera del chip</td><td>Sí (todo)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="inv-block">
+    <div class="inv-head" style="background:var(--cyan-dim);border-color:rgba(6,182,212,.2)">
+      <div class="inv-icon">❓</div>
+      <div>
+        <div class="inv-htitle" style="color:var(--cyan)">Preguntas de análisis — Grupo 5</div>
+        <div class="inv-hsub">Respondan en grupo y prepárense para exponer</div>
+      </div>
+    </div>
+    <div class="inv-body">
+      <div class="questions-list">
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g5-dim);color:var(--g5);border:1px solid rgba(249,115,22,.3)">Q1</div>
+          <div>
+            <div class="q-text">Un procesador moderno tiene L1 separada para instrucciones (L1-I) y datos (L1-D). ¿Por qué esta separación? ¿Qué problema resuelve tener dos cachés L1 distintas en lugar de una sola combinada? ¿Cuándo podría ser una desventaja?</div>
+            <div class="q-hint">Pista: investiga la arquitectura Harvard y el problema de conflictos de banco en caché unificada.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g5-dim);color:var(--g5);border:1px solid rgba(249,115,22,.3)">Q2</div>
+          <div>
+            <div class="q-text">Cuando un procesador tiene 8 núcleos y cada uno tiene su propia caché L1 y L2, ¿qué problema de coherencia surge si dos núcleos intentan modificar la misma dirección de memoria simultáneamente? ¿Cómo lo resuelven los protocolos MESI y MOESI?</div>
+            <div class="q-hint">Pista: busquen "cache coherence protocol" y los estados Modified, Exclusive, Shared, Invalid.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g5-dim);color:var(--g5);border:1px solid rgba(249,115,22,.3)">Q3</div>
+          <div>
+            <div class="q-text">La memoria virtual permite que un proceso crea que tiene más RAM de la que existe físicamente. Expliquen el proceso completo que ocurre cuando un programa accede a una dirección virtual que no está cargada en RAM (page fault). ¿Cuántos pasos involucra y qué componentes de hardware y software participan?</div>
+            <div class="q-hint">Pista: MMU → TLB miss → SO busca en disco → carga página → actualiza tabla de páginas → reinicia la instrucción.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g5-dim);color:var(--g5);border:1px solid rgba(249,115,22,.3)">Q4</div>
+          <div>
+            <div class="q-text">El TLB (Translation Lookaside Buffer) es en realidad una caché especializada para traducciones de direcciones. ¿Qué almacena exactamente, por qué es crucial para el rendimiento de la memoria virtual y qué ocurre cuando hay un TLB miss? Comparen el impacto de un TLB miss vs. un cache miss normal.</div>
+            <div class="q-hint">Pista: sin TLB, cada acceso a memoria requeriría consultar la tabla de páginas en RAM — 2 accesos a RAM por cada dato.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-num" style="background:var(--g5-dim);color:var(--g5);border:1px solid rgba(249,115,22,.3)">Q5</div>
+          <div>
+            <div class="q-text">Investiguen el concepto de "huge pages" o "large pages" (páginas grandes) en sistemas operativos modernos. ¿Qué ventaja concreta tiene usar páginas de 2 MB o 1 GB en lugar de las páginas estándar de 4 KB? ¿En qué aplicaciones reales (bases de datos, VMs, servidores) se usa esto y por qué?</div>
+            <div class="q-hint">Pista: menos entradas en el TLB = menos TLB misses = mejor rendimiento en aplicaciones con grandes conjuntos de datos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deliverable">
+    <div class="dl-title">// Entregable del Grupo 5</div>
+    <div class="dl-items">
+      <div class="dl-item"><div class="dl-check">✓</div><div>Diagrama explicado de la <strong>jerarquía de caché L1/L2/L3</strong> con latencias y tamaños reales</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Explicación del <strong>flujo de un page fault</strong> paso a paso</div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Respuestas argumentadas a las <strong>5 preguntas</strong></div></div>
+      <div class="dl-item"><div class="dl-check">✓</div><div>Exposición de <strong>3 minutos</strong> explicando por qué la caché es el componente más importante del rendimiento</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SOLUTION (docente) -->
+<div style="margin-top:40px;text-align:center">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:12px">// Acceso docente — guía de respuestas</div>
+  <div style="display:flex;gap:10px;justify-content:center">
+    <input id="sol-input" type="password" placeholder="clave docente"
+      style="background:#010409;border:1px solid var(--border);color:var(--text);
+        font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 14px;
+        border-radius:7px;outline:none;letter-spacing:.1em;width:200px"
+      onkeydown="if(event.key==='Enter')checkSolution()">
+    <button onclick="checkSolution()"
+      style="background:var(--green-dim);border:1px solid rgba(74,222,128,.3);color:var(--green);
+        font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+        padding:8px 18px;border-radius:7px;cursor:pointer">
+      Ver guía
+    </button>
+  </div>
+</div>
+
+<div id="global-solution" class="global-solution">
+  <div class="gs-title">// Claves del taller — Vista docente</div>
+  <div class="gs-group">
+    <div class="gsg-head" style="color:var(--g1)">G1 — DDR1 y DDR2 · Clave: <span style="background:rgba(59,130,246,.1);padding:2px 8px;border-radius:4px">ddr1memoria</span></div>
+    <div class="gsg-answers">
+      <div class="gsg-ans"><strong>Q1 DDR:</strong> DDR transfiere datos en el flanco de subida Y bajada del reloj (2 transferencias/ciclo). SDRAM solo en el flanco de subida.</div>
+      <div class="gsg-ans"><strong>Q2 Pines:</strong> DDR2 añade señales diferenciales para mayor inmunidad al ruido a altas frecuencias. Terminaciones integradas (ODT - On-Die Termination) reemplazan resistencias externas.</div>
+      <div class="gsg-ans"><strong>Q3 Latencia:</strong> DDR2 a 800 MHz con CL6 → 6/(800/2) = 15 ns. DDR1 a 400 MHz con CL3 → 3/(400/2) = 15 ns. La latencia real es similar, pero el ancho de banda es el doble.</div>
+      <div class="gsg-ans"><strong>Q4 Ancho de banda:</strong> DDR1-400: 400M × 8B = 3.2 GB/s. DDR2-1066: 1066M × 8B = 8.5 GB/s. HDD de 7200 RPM: ~80 MB/s. La RAM era 40–100× más rápida que el disco.</div>
+    </div>
+  </div>
+  <div class="gs-group">
+    <div class="gsg-head" style="color:var(--g2)">G2 — DDR3 · Clave: <span style="background:rgba(234,179,8,.1);padding:2px 8px;border-radius:4px">ddr3evolve</span></div>
+    <div class="gsg-answers">
+      <div class="gsg-ans"><strong>Q1 Prefetch 8n:</strong> Cada acceso lee 8 bits internamente aunque la CPU solo necesite 1. Mejora ancho de banda pero aumenta latencia interna. El precio: mayor latencia CAS expresada en ciclos.</div>
+      <div class="gsg-ans"><strong>Q2 Dual Channel:</strong> Dos módulos trabajan en paralelo → el bus efectivo pasa de 64 a 128 bits → el ancho de banda se duplica. Beneficio real: 10-30% en aplicaciones intensivas en memoria.</div>
+      <div class="gsg-ans"><strong>Q3 Longevidad:</strong> Inversión masiva de fabricantes de placas y CPUs, ecosistema maduro, precio bajo, suficiente para la mayoría de cargas. DDR4 no ofrecía ventajas claras para usuario promedio en 2014.</div>
+      <div class="gsg-ans"><strong>Q4 XMP:</strong> Creado por Intel. Perfil de velocidades y latencias certificado por el fabricante del módulo, almacenado en el chip SPD. Se activa en BIOS. Es overclock con garantía del fabricante del módulo.</div>
+    </div>
+  </div>
+  <div class="gs-group">
+    <div class="gsg-head" style="color:var(--g3)">G3 — DDR4 · Clave: <span style="background:rgba(34,197,94,.1);padding:2px 8px;border-radius:4px">ddr4moderno</span></div>
+    <div class="gsg-answers">
+      <div class="gsg-ans"><strong>Q1 Bank Groups:</strong> 4 Bank Groups permiten operaciones back-to-back en grupos diferentes sin conflicto de timing. DDR3 tenía que esperar entre accesos consecutivos al mismo banco.</div>
+      <div class="gsg-ans"><strong>Q2 ECC:</strong> Usa código de Hamming extendido. Detecta y corrige 1 bit erróneo, detecta 2 bits erróneos. Requiere 1 chip adicional por módulo (72 bits totales en lugar de 64). Crítico en servidores donde un bit flip puede corromper datos financieros o médicos.</div>
+      <div class="gsg-ans"><strong>Q4 Latencia real:</strong> DDR4-2133 CL15: (15/1066.5)×1000 = 14.07 ns. DDR4-3200 CL18: (18/1600)×1000 = 11.25 ns. Más frecuencia = menos ns aunque CL sea mayor.</div>
+    </div>
+  </div>
+  <div class="gs-group">
+    <div class="gsg-head" style="color:var(--g4)">G4 — DDR5 · Clave: <span style="background:rgba(139,92,246,.1);padding:2px 8px;border-radius:4px">ddr5futuro</span></div>
+    <div class="gsg-answers">
+      <div class="gsg-ans"><strong>Q1 Dual channel:</strong> 2 canales × 32 bits permiten accesos paralelos independientes. Si un canal está ocupado con refresco, el otro sigue operando. Mejora real en workloads con múltiples hilos concurrentes.</div>
+      <div class="gsg-ans"><strong>Q2 PMIC:</strong> Voltaje regulado directamente en el módulo → menos pérdida en el PCB → voltaje más estable bajo carga → permite mayores frecuencias con más estabilidad. Los fabricantes de placa madre simplifican su diseño de potencia.</div>
+      <div class="gsg-ans"><strong>Q4 On-die ECC:</strong> El ECC interno corrige errores dentro del chip de memoria pero NO reporta errores al controlador de memoria. El sistema no sabe si hubo un error. El ECC de servidor (RDIMM DDR5) reporta y registra todos los errores.</div>
+    </div>
+  </div>
+  <div class="gs-group">
+    <div class="gsg-head" style="color:var(--g5)">G5 — Caché y Mem. Virtual · Clave: <span style="background:rgba(249,115,22,.1);padding:2px 8px;border-radius:4px">cachememoria5</span></div>
+    <div class="gsg-answers">
+      <div class="gsg-ans"><strong>Q1 L1 separada:</strong> L1-I solo lee instrucciones (no se escribe), L1-D lee y escribe datos. Separar evita que instrucciones desplacen datos y viceversa. Desventaja: si el programa tiene muchos datos y pocas instrucciones únicas, el espacio de L1-I queda desaprovechado.</div>
+      <div class="gsg-ans"><strong>Q2 MESI:</strong> Modified (solo este núcleo, datos sucios), Exclusive (solo este núcleo, datos limpios), Shared (varios núcleos, solo lectura), Invalid (dato no válido). Antes de modificar un dato Shared, el núcleo debe invalidarlo en todos los demás (bus snooping).</div>
+      <div class="gsg-ans"><strong>Q3 Page fault:</strong> CPU accede dir. virtual → MMU busca en TLB (miss) → busca en tabla de páginas en RAM (miss) → SO genera page fault → SO busca la página en disco (swap) → carga en RAM → actualiza tabla de páginas → actualiza TLB → reinicia instrucción. ~10 ms si necesita disco.</div>
+      <div class="gsg-ans"><strong>Q4 TLB:</strong> TLB almacena traducciones recientes virtual→física. TLB miss requiere "page table walk": consultar tabla de páginas multinivel en RAM (2–4 accesos extra a RAM). Mucho más costoso que cache miss normal.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  ITB — Instituto Tecnológico de Negocios &nbsp;·&nbsp;
+  <span>ARQ — Taller Semana 2 · Investigación RAM DDR</span>
+</footer>
+
+<script>
+/* ─── TIMER ─────────────────────────────────────── */
+let seconds = 45 * 60, running = false, interval;
+function fmt(s){const m=Math.floor(s/60),sc=s%60;return(m<10?'0':'')+m+':'+(sc<10?'0':'')+sc}
+document.getElementById('td').textContent=fmt(seconds);
+function toggleTimer(){
+  running=!running;
+  const btn=document.getElementById('tbtn');
+  if(running){
+    btn.textContent='⏸ pausar';btn.classList.add('on');
+    interval=setInterval(()=>{
+      if(seconds>0){seconds--;document.getElementById('td').textContent=fmt(seconds);}
+      else{clearInterval(interval);running=false;btn.textContent='▶ iniciar';btn.classList.remove('on');
+        document.getElementById('td').style.color='var(--red)';
+        document.getElementById('td').textContent='00:00';}
+    },1000);
+  } else {
+    clearInterval(interval);btn.textContent='▶ iniciar';btn.classList.remove('on');
+  }
+}
+function resetTimer(){
+  clearInterval(interval);running=false;seconds=45*60;
+  document.getElementById('td').textContent=fmt(seconds);
+  document.getElementById('td').style.color='var(--amber)';
+  const btn=document.getElementById('tbtn');btn.textContent='▶ iniciar';btn.classList.remove('on');
+}
+
+/* ─── GROUP SELECTION ───────────────────────────── */
+function selectGroup(n){
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById('access-'+i).classList.remove('vis');
+    document.getElementById('mission-'+i).classList.remove('vis');
+  });
+  document.getElementById('access-'+n).classList.add('vis');
+  document.getElementById('access-'+n).scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ─── KEY CHECK ─────────────────────────────────── */
+function checkKey(n){
+  const val=document.getElementById('ki-'+n).value.trim();
+  const err=document.getElementById('ke-'+n);
+  if(val===ACCESS_PASSWORDS[n]){
+    document.getElementById('access-'+n).classList.remove('vis');
+    const mp=document.getElementById('mission-'+n);
+    mp.classList.add('vis');
+    mp.scrollIntoView({behavior:'smooth',block:'start'});
+    err.style.display='none';
+  } else {
+    err.style.display='block';
+    document.getElementById('ki-'+n).style.borderColor='var(--red)';
+    setTimeout(()=>document.getElementById('ki-'+n).style.borderColor='',1500);
+  }
+}
+
+/* ─── SOLUTION CHECK ────────────────────────────── */
+function checkSolution(){
+  const val=document.getElementById('sol-input').value.trim();
+  const gs=document.getElementById('global-solution');
+  if(val===SOLUTION_PASSWORD){
+    gs.classList.add('vis');
+    gs.scrollIntoView({behavior:'smooth'});
+  } else {
+    document.getElementById('sol-input').style.borderColor='var(--red)';
+    setTimeout(()=>document.getElementById('sol-input').style.borderColor='',1500);
+  }
+}
+</script>
+</body>
+</html>
