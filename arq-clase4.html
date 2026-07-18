@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ARQ — Semana 4 · Instituto Tecnológico de Negocios</title>
+<script>
+(function(){
+  const saved = localStorage.getItem('itb-theme') || 'dark';
+  if(saved === 'light') document.documentElement.classList.add('light');
+})();
+function toggleTheme(){
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('itb-theme', isLight ? 'light' : 'dark');
+  const icon = document.getElementById('theme-icon');
+  if(icon) icon.textContent = isLight ? '☀️' : '🌙';
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── DARK MODE (default) ── */
+:root{
+  --bg:#0D1117;--surface:#161B22;--surface2:#1C2129;
+  --border:#21262D;--border2:#30363D;
+  --ac:#06B6D4;--ac-dim:#062830;--ac2:#06B6D4;
+  --muted:#8B949E;--text:#E6EDF3;--radius:10px;
+  --green:#4ADE80;--green-dim:#1a4731;
+  --amber:#F59E0B;--amber-dim:#2d2208;
+  --rose:#FF7B72;--blue:#3B82F6;--blue-dim:#0c1d3f;
+  --grid-line:rgba(255,255,255,.012);
+  --nav-bg:rgba(13,17,23,.92);
+  --code-bg:#010409;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+
+/* ── LIGHT MODE ── */
+html.light{
+  --bg:#F6F8FA;--surface:#FFFFFF;--surface2:#F0F2F5;
+  --border:#D0D7DE;--border2:#C5CDD5;
+  --muted:#656D76;--text:#1F2328;
+  --green:#1A7F37;--green-dim:#DAFBE1;
+  --amber:#9A6700;--amber-dim:#FFF8C5;
+  --rose:#CF222E;--blue:#0969DA;--blue-dim:#DDF4FF;
+  --ac-dim:#DDF4FF;
+  --grid-line:rgba(0,0,0,.04);
+  --nav-bg:rgba(246,248,250,.94);
+  --code-bg:#F6F8FA;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+}
+html.light .code-block,
+html.light .code-body,
+html.light .cb-eq,
+html.light .cb-in{color:#1F2328 !important}
+html.light body::before{
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px) !important
+}
+
+/* ── THEME TOGGLE SWITCH ── */
+.theme-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;flex-shrink:0}
+.toggle-track{width:38px;height:20px;border-radius:20px;background:var(--border2);border:1px solid var(--border);
+  position:relative;transition:background .25s;cursor:pointer;flex-shrink:0}
+html.light .toggle-track{background:#D0D7DE}
+.toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+  background:var(--muted);transition:all .25s;display:flex;align-items:center;justify-content:center;font-size:8px}
+html.light .toggle-knob{transform:translateX(18px);background:var(--amber)}
+.toggle-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden;transition:background .25s,color .25s}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:44px 44px;transition:opacity .25s}
+nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:54px;gap:12px;transition:background .25s,border-color .25s}
+.nav-brand{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:var(--ac);display:flex;align-items:center;gap:7px;white-space:nowrap}
+.nav-brand .sep{color:var(--border)}.nav-brand .dim{color:var(--muted);font-weight:400}
+.nav-badge{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--ac-dim);border:1px solid var(--border);color:var(--ac);padding:3px 10px;border-radius:20px;white-space:nowrap}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:6px;text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-back:hover{color:var(--text);border-color:var(--ac)}
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 1.5rem}
+.sec-tag{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-tag::after{content:'';flex:1;height:1px;background:var(--border)}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:26px 2rem;text-align:center;color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;margin-top:20px}
+footer span{color:var(--ac)}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+th{background:var(--surface2);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:9px 13px;border:1px solid var(--border);text-align:left}
+td{padding:9px 13px;border:1px solid var(--border);color:var(--muted);vertical-align:middle;transition:background .2s}
+tr:hover td{background:var(--surface2)}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--ac);font-weight:600}
+
+.hero{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:60px 1.5rem 48px;text-align:center}
+.hero h1{font-family:'JetBrains Mono',monospace;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.1;margin-bottom:8px}
+.hero-chips{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid #06B6D444;color:var(--ac);background:#062830}
+.section-block{margin-bottom:10px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .25s}
+.section-block.active{border-color:var(--ac)}
+.section-header{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;transition:background .2s}
+.section-header:hover{background:var(--surface2)}
+.section-block.active .section-header{background:#062830}
+.sh-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--muted);background:var(--surface2);border:1px solid var(--border);min-width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}
+.section-block.active .sh-num{color:var(--ac);background:#062830;border-color:#06B6D444}
+.sh-info{flex:1}
+.sh-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.sh-title{font-size:16px;font-weight:700}
+.sh-toggle{font-size:18px;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.section-block.active .sh-toggle{transform:rotate(180deg);color:var(--ac)}
+.section-body{display:none;padding:24px;border-top:1px solid var(--border)}
+.section-block.active .section-body{display:block}
+.concept-lead{font-size:15px;color:var(--text);line-height:1.75;margin-bottom:16px}
+.formula-box{background:#010409;border:1px solid var(--border);border-radius:9px;padding:18px 22px;margin:16px 0;text-align:center}
+.formula-box .f-main{font-family:'JetBrains Mono',monospace;font-size:clamp(14px,3vw,19px);font-weight:700;color:var(--ac);margin-bottom:6px;line-height:1.5}
+.formula-box .f-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin:16px 0}
+.code-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.code-dots{display:flex;gap:5px}.code-dots span{width:10px;height:10px;border-radius:50%}
+.d1{background:#FF5F56}.d2{background:#FFBD2E}.d3{background:#27C93F}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.code-body{padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.9}
+.cb-in{color:var(--muted)}.cb-pr{color:var(--ac);font-weight:700}.cb-re{color:#4ADE80;font-weight:700}
+.tip-box{background:#052e16;border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:13px 17px;margin:14px 0;display:flex;gap:10px}
+.tip-box .tb-text{font-size:13px;color:var(--text);line-height:1.6}
+.warn-box{background:var(--amber-dim);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:13px 17px;margin:14px 0;display:flex;gap:10px}
+.warn-box .tb-text{font-size:13px;color:var(--muted);line-height:1.6}
+.info-box{background:var(--blue-dim);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:13px 17px;margin:14px 0;display:flex;gap:10px}
+.info-box .tb-text{font-size:13px;color:var(--muted);line-height:1.6}
+.nb-btn{font-family:'JetBrains Mono',monospace;font-size:12px;padding:9px 18px;border-radius:7px;text-decoration:none;border:1px solid var(--border);color:var(--muted);background:var(--surface);transition:all .2s}
+.nb-btn:hover{border-color:var(--ac);color:var(--ac)}
+.nb-btn.primary{background:#062830;color:var(--ac);border-color:#06B6D444}
+.nb-btn.primary:hover{background:var(--ac);color:#0D1117}
+</style></head><body>
+<nav>
+  <div class="nav-brand">
+    <span>📖</span>
+    ARQ <span class="sep">/</span> <span class="dim">semana-4</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="nav-badge">Semana 4 de 6</div>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Cambiar modo claro/oscuro">
+    <div class="toggle-track"><div class="toggle-knob" id="theme-icon">🌙</div></div>
+    <span class="toggle-label">tema</span>
+  </div>
+    <a class="nav-back" href="ARQ.html">↩ Índice</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:10px">
+    <span style="flex:1;max-width:70px;height:1px;background:var(--border);display:block"></span>
+    Semana 4 · Arquitectura del Computador
+    <span style="flex:1;max-width:70px;height:1px;background:var(--border);display:block"></span>
+  </div>
+  <h1><span style="color:var(--muted);font-weight:300">Componentes de la Tarjeta Madre</span></h1>
+  <p style="color:var(--muted);font-size:15px;max-width:560px;margin:12px auto 0">Conoce la estructura de la tarjeta madre, identifica sus principales componentes, comprende su funcionamiento y analiza las tecnologías modernas utilizadas en los computadores actuales.</p>
+  <div class="hero-chips">
+    <span class="chip">Módulo: Introducción a la Tarjeta Madre</span><span class="chip">Módulo: Componentes Principales de la Tarjeta Madre</span><span class="chip">Módulo: Tecnologías Actuales de la Tarjeta Madre</span><span class="chip">Módulo: Caso Práctico — Análisis de una Tarjeta Madre</span>
+  </div>
+</div>
+
+<div class="wrap">
+  
+    <div class="section-block" id="sb0">
+      <div class="section-header" onclick="toggle(0)">
+        <div class="sh-num">01</div>
+        <div class="sh-info">
+          <div class="sh-label">// Módulo 1</div>
+          <div class="sh-title">Módulo: Introducción a la Tarjeta Madre</div>
+        </div>
+        <div class="sh-toggle">▾</div>
+      </div>
+      <div class="section-body"><div class="concept-lead">La <strong style="color:#06B6D4">tarjeta madre</strong> (Motherboard o Placa Base) es el circuito principal de un computador. Sobre ella se conectan el procesador, la memoria RAM, las unidades de almacenamiento, las tarjetas de expansión y los diferentes dispositivos que permiten el funcionamiento del sistema.
+Su función principal consiste en <strong style="color:#06B6D4">coordinar la comunicación entre todos los componentes del computador</strong>, distribuir la energía eléctrica y facilitar el intercambio de información mediante buses de datos.
+Actualmente las tarjetas madre incorporan tecnologías como <strong style="color:#06B6D4">UEFI, PCI Express, DDR5, M.2 NVMe y USB 3.2</strong>, permitiendo equipos más rápidos y eficientes.</div><table><tr><th>Componente</th><th>Función</th><th>Ejemplo</th></tr>
+      <tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Tarjeta Madre</td><td >Interconecta todos los componentes del computador</td><td >ASUS Prime B760</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Procesador (CPU)</td><td >Ejecuta instrucciones y procesa datos</td><td >Intel Core i5</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Memoria RAM</td><td >Almacena información temporal</td><td >DDR5 16 GB</td></tr>
+    </table><div class="tip-box"><div style="font-size:16px;flex-shrink:0">💡</div><div class="tb-text">Antes de actualizar un computador, verifique siempre la compatibilidad entre la tarjeta madre y los demás componentes del equipo.</div></div><div class="warn-box"><div style="font-size:16px;flex-shrink:0">⚠️</div><div class="tb-text">No todas las tarjetas madre son compatibles con cualquier procesador. Debe comprobar el <strong style="color:#F59E0B">socket</strong> y el <strong style="color:#F59E0B">chipset</strong> antes de instalar un nuevo CPU.</div></div><div class="info-box"><div style="font-size:16px;flex-shrink:0">📌</div><div class="tb-text">La tarjeta madre también recibe los nombres de <strong style="color:#3B82F6">Motherboard</strong>, <strong style="color:#3B82F6">Mainboard</strong> o <strong style="color:#3B82F6">Placa Base</strong>.</div></div></div>
+    </div>
+    <div class="section-block" id="sb1">
+      <div class="section-header" onclick="toggle(1)">
+        <div class="sh-num">02</div>
+        <div class="sh-info">
+          <div class="sh-label">// Módulo 2</div>
+          <div class="sh-title">Módulo: Componentes Principales de la Tarjeta Madre</div>
+        </div>
+        <div class="sh-toggle">▾</div>
+      </div>
+      <div class="section-body"><div class="concept-lead">Cada componente de la tarjeta madre cumple una función específica para garantizar el correcto funcionamiento del computador. Conocer estos elementos permite comprender cómo interactúan el hardware y los dispositivos conectados al sistema.
+Los principales componentes son:
+- Socket del procesador.
+- Ranuras DIMM para memoria RAM.
+- Chipset.
+- BIOS o UEFI.
+- Ranuras PCI Express.
+- Conectores SATA.
+- Conectores M.2.
+- Conectores de alimentación ATX.
+- Batería CMOS.
+- Puertos de entrada y salida.</div><table><tr><th>Componente</th><th>Función</th><th>Tecnología Actual</th></tr>
+      <tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Socket</td><td >Aloja el procesador</td><td >LGA1700, AM5</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >DIMM</td><td >Instala la memoria RAM</td><td >DDR4, DDR5</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Chipset</td><td >Coordina la comunicación del sistema</td><td >Intel Z790, AMD X870</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >BIOS / UEFI</td><td >Inicializa el hardware</td><td >UEFI</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >PCI Express</td><td >Tarjetas de expansión</td><td >PCIe 5.0</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >SATA</td><td >Conecta discos HDD y SSD SATA</td><td >SATA III</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >M.2</td><td >Conecta SSD de alta velocidad</td><td >NVMe PCIe</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >CMOS</td><td >Conserva la configuración del BIOS</td><td >Batería CR2032</td></tr>
+    </table><div class="tip-box"><div style="font-size:16px;flex-shrink:0">💡</div><div class="tb-text">La mayoría de las tarjetas madre incluyen el nombre de cada componente impreso sobre la placa, facilitando su identificación durante el mantenimiento.</div></div><div class="warn-box"><div style="font-size:16px;flex-shrink:0">⚠️</div><div class="tb-text">No confunda la memoria RAM con el almacenamiento. La RAM almacena información temporal, mientras que los discos duros y SSD almacenan la información de manera permanente.</div></div><div class="info-box"><div style="font-size:16px;flex-shrink:0">📌</div><div class="tb-text">Las tarjetas madre modernas integran funciones como audio, red, Bluetooth y Wi-Fi, reduciendo la necesidad de instalar tarjetas adicionales.</div></div></div>
+    </div>
+    <div class="section-block" id="sb2">
+      <div class="section-header" onclick="toggle(2)">
+        <div class="sh-num">03</div>
+        <div class="sh-info">
+          <div class="sh-label">// Módulo 3</div>
+          <div class="sh-title">Módulo: Tecnologías Actuales de la Tarjeta Madre</div>
+        </div>
+        <div class="sh-toggle">▾</div>
+      </div>
+      <div class="section-body"><div class="concept-lead">Las tarjetas madre evolucionan constantemente para ofrecer mayor velocidad, capacidad de expansión y compatibilidad con los nuevos dispositivos del mercado.
+Entre las tecnologías actuales destacan:
+- Memorias DDR5.
+- Ranuras PCI Express 5.0.
+- SSD NVMe mediante M.2.
+- USB Tipo C.
+- Wi-Fi 6E.
+- Bluetooth 5.x.
+- UEFI.
+- Ethernet de alta velocidad.</div><table><tr><th>Tecnología</th><th>Ventaja</th><th>Aplicación</th></tr>
+      <tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >DDR5</td><td >Mayor velocidad de memoria</td><td >Equipos modernos</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >PCIe 5.0</td><td >Mayor ancho de banda</td><td >Tarjetas gráficas y SSD</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >M.2 NVMe</td><td >Almacenamiento ultrarrápido</td><td >SSD modernos</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >USB Tipo C</td><td >Transferencia de alta velocidad</td><td >Dispositivos externos</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Wi-Fi 6E</td><td >Mejor conectividad inalámbrica</td><td >Redes actuales</td></tr>
+    </table><div class="tip-box"><div style="font-size:16px;flex-shrink:0">💡</div><div class="tb-text">Antes de adquirir un nuevo componente, consulte las especificaciones técnicas del fabricante para verificar la compatibilidad.</div></div><div class="warn-box"><div style="font-size:16px;flex-shrink:0">⚠️</div><div class="tb-text">Aunque dos SSD tengan formato M.2, no todos utilizan la tecnología NVMe. Algunos funcionan mediante la interfaz SATA.</div></div><div class="info-box"><div style="font-size:16px;flex-shrink:0">📌</div><div class="tb-text">Las tecnologías actuales permiten construir computadores más rápidos, eficientes y con mayor capacidad de expansión que generaciones anteriores.</div></div></div>
+    </div>
+    <div class="section-block" id="sb3">
+      <div class="section-header" onclick="toggle(3)">
+        <div class="sh-num">04</div>
+        <div class="sh-info">
+          <div class="sh-label">// Módulo 4</div>
+          <div class="sh-title">Módulo: Caso Práctico — Análisis de una Tarjeta Madre</div>
+        </div>
+        <div class="sh-toggle">▾</div>
+      </div>
+      <div class="section-body"><div class="concept-lead">Una empresa desea actualizar los computadores del departamento administrativo. Para ello analiza una tarjeta madre con las siguientes características:
+- Socket LGA1700.
+- Cuatro ranuras DDR5.
+- Dos conectores M.2 NVMe.
+- Cuatro puertos SATA III.
+- Ranura PCI Express 5.0.
+- Firmware UEFI.
+El departamento de tecnología debe verificar la compatibilidad de los nuevos componentes antes de realizar la actualización.</div><div class="code-block">
+      <div class="code-bar"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><div class="code-file">Compatibilidad de Hardware</div></div>
+      <div class="code-body">
+        <div><span style="color:var(--muted);min-width:70px;display:inline-block">entrada:</span><span class="cb-in">Procesador = Intel Core i5-13400, Memoria = DDR5 16 GB, Almacenamiento = SSD NVMe M.2, Tarjeta gráfica = PCI Express</span></div><div><span style="color:var(--muted);min-width:70px;display:inline-block">proceso:</span><span class="cb-pr">Verificar compatibilidad del socket LGA1700.</span></div><div><span style="color:var(--muted);min-width:70px;display:inline-block">proceso:</span><span class="cb-pr">Confirmar que la memoria sea DDR5.</span></div><div><span style="color:var(--muted);min-width:70px;display:inline-block">proceso:</span><span class="cb-pr">Verificar que el SSD utilice interfaz M.2 NVMe.</span></div><div><span style="color:var(--muted);min-width:70px;display:inline-block">proceso:</span><span class="cb-pr">Comprobar disponibilidad de la ranura PCI Express.</span></div><div><span style="color:var(--muted);min-width:70px;display:inline-block">resultado:</span><span class="cb-re">Todos los componentes son compatibles con la tarjeta madre seleccionada.</span></div>
+      </div>
+    </div><table><tr><th>Componente</th><th>Compatible</th><th>Justificación</th></tr>
+      <tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Procesador Intel Core i5-13400</td><td >Sí</td><td >Utiliza socket LGA1700</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Memoria DDR5</td><td >Sí</td><td >Compatible con las ranuras DIMM DDR5</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >SSD NVMe M.2</td><td >Sí</td><td >Existe conector M.2 disponible</td></tr><tr><td style="color:var(--ac);font-weight:600;font-family:'JetBrains Mono',monospace" >Tarjeta gráfica PCIe</td><td >Sí</td><td >Compatible con PCI Express 5.0</td></tr>
+    </table><div class="tip-box"><div style="font-size:16px;flex-shrink:0">💡</div><div class="tb-text">Antes de comprar un componente nuevo, consulte siempre el manual técnico de la tarjeta madre para verificar compatibilidad y capacidad máxima soportada.</div></div><div class="warn-box"><div style="font-size:16px;flex-shrink:0">⚠️</div><div class="tb-text">Instalar un procesador con un socket diferente puede provocar daños físicos en la placa y en el procesador.</div></div><div class="info-box"><div style="font-size:16px;flex-shrink:0">📌</div><div class="tb-text">Una correcta selección de componentes garantiza mayor rendimiento, estabilidad y vida útil del computador.</div></div></div>
+    </div>
+  
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-top:32px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">// Lista de verificación</div>
+      <div id="cl-count" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);background:#062830;padding:3px 10px;border-radius:20px;border:1px solid #06B6D444">0 / 16</div>
+    </div>
+    <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden"><div id="cl-fill" style="height:100%;background:linear-gradient(90deg,var(--ac),#818CF8);border-radius:2px;width:0%;transition:width .3s"></div></div>
+    
+    <div id="cli0" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk0" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(0,this)">
+      <label for="chk0" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Comprendo qué es una tarjeta madre.</label>
+    </div>
+    <div id="cli1" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk1" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(1,this)">
+      <label for="chk1" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Identifico su función principal.</label>
+    </div>
+    <div id="cli2" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk2" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(2,this)">
+      <label for="chk2" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Reconozco su importancia dentro del computador.</label>
+    </div>
+    <div id="cli3" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk3" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(3,this)">
+      <label for="chk3" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">--</label>
+    </div>
+    <div id="cli4" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk4" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(4,this)">
+      <label for="chk4" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Identifico los principales componentes.</label>
+    </div>
+    <div id="cli5" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk5" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(5,this)">
+      <label for="chk5" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Comprendo la función de cada uno.</label>
+    </div>
+    <div id="cli6" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk6" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(6,this)">
+      <label for="chk6" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Diferencio memoria, almacenamiento y procesamiento.</label>
+    </div>
+    <div id="cli7" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk7" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(7,this)">
+      <label for="chk7" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">--</label>
+    </div>
+    <div id="cli8" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk8" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(8,this)">
+      <label for="chk8" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Identifico tecnologías modernas.</label>
+    </div>
+    <div id="cli9" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk9" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(9,this)">
+      <label for="chk9" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Comprendo sus ventajas.</label>
+    </div>
+    <div id="cli10" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk10" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(10,this)">
+      <label for="chk10" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Diferencio tecnologías antiguas y actuales.</label>
+    </div>
+    <div id="cli11" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk11" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(11,this)">
+      <label for="chk11" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">--</label>
+    </div>
+    <div id="cli12" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk12" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(12,this)">
+      <label for="chk12" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Identifico los componentes de una tarjeta madre.</label>
+    </div>
+    <div id="cli13" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk13" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(13,this)">
+      <label for="chk13" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Analizo la compatibilidad entre hardware.</label>
+    </div>
+    <div id="cli14" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk14" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(14,this)">
+      <label for="chk14" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Comprendo la importancia de verificar las especificaciones técnicas.</label>
+    </div>
+    <div id="cli15" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input type="checkbox" id="chk15" style="width:15px;height:15px;accent-color:var(--ac);cursor:pointer;flex-shrink:0;margin-top:2px" onchange="chk(15,this)">
+      <label for="chk15" style="font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5">Estoy preparado para identificar los componentes en una tarjeta madre real.</label>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:32px;padding-bottom:32px;justify-content:space-between;flex-wrap:wrap">
+    <a class="nb-btn" href="ARQ.html">↩ Índice ARQ</a>
+    <a class="nb-btn primary" href="arq-taller4.html">Taller S4 →</a>
+  </div>
+</div>
+
+<footer>
+  Instituto Tecnológico de Negocios &nbsp;·&nbsp; <span>ARQ — Semana 4 · Componentes de la Tarjeta Madre</span>
+</footer>
+
+<script>
+const TOTAL=16,KEY='ARQ_s4_v1';
+let prog=JSON.parse(localStorage.getItem(KEY)||'[]');
+if(prog.length!==TOTAL)prog=Array(TOTAL).fill(false);
+prog.forEach((v,i)=>{if(v){const c=document.getElementById('chk'+i);if(c){c.checked=true;document.getElementById('cli'+i).querySelector('label').style.textDecoration='line-through';}}});
+updateCL();
+function chk(i,el){prog[i]=el.checked;el.parentElement.querySelector('label').style.textDecoration=el.checked?'line-through':'none';localStorage.setItem(KEY,JSON.stringify(prog));updateCL()}
+function updateCL(){const d=prog.filter(Boolean).length;const cc=document.getElementById('cl-count');const cf=document.getElementById('cl-fill');if(cc)cc.textContent=d+' / '+TOTAL;if(cf)cf.style.width=(TOTAL?d/TOTAL*100:0)+'%'}
+function toggle(i){const b=document.getElementById('sb'+i);const was=b.classList.contains('active');document.querySelectorAll('.section-block').forEach(x=>x.classList.remove('active'));if(!was)b.classList.add('active');}
+</script>
+</body></html>
